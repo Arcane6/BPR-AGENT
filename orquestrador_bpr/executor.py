@@ -236,6 +236,8 @@ class ResultadoEndereco:
     regravacoes: int = 0
     erro: str | None = None
     duracao_s: float = 0.0
+    # O Vertex recusou o pedido por configuração (não é falha do agente).
+    falha_de_configuracao: bool = False
 
     @property
     def persistencia_status(self) -> str | None:
@@ -276,6 +278,12 @@ class ResultadoEndereco:
             "erro": self.erro,
             "duracao_s": round(self.duracao_s, 1),
         }
+
+
+def _recusa_definitiva(exc: BaseException) -> bool:
+    """Erro de cliente do Vertex que repetir não resolve."""
+    codigo = getattr(exc, "code", None)
+    return isinstance(codigo, int) and 400 <= codigo < 500 and codigo not in (408, 429)
 
 
 def _avisar(ao_evento: Callable[[dict[str, Any]], None] | None, tentativa: int,
@@ -368,6 +376,15 @@ async def executar_endereco(
             resultado.erro = (
                 f"{type(exc).__name__}: {exc}"
             )
+            # Pedido recusado pelo Vertex por configuração (400, 401, 403,
+            # 404): a próxima tentativa manda o mesmo pedido e é recusada do
+            # mesmo jeito. Só gastaria tempo; 408, 429 e 5xx seguem tentando.
+            if _recusa_definitiva(exc):
+                resultado.erro = (
+                    "Pedido recusado pelo Vertex AI por configuração (não adianta "
+                    f"tentar de novo): {resultado.erro}")
+                resultado.falha_de_configuracao = True
+                break
         # Só tenta de novo se nada foi gravado nem extraído; caso contrário
         # duplicaria a linha ou reprocessaria o TSSR. Chamada barrada pelo
         # guard não rodou e não impede a nova tentativa.
@@ -407,7 +424,14 @@ async def executar_endereco(
                 "A resposta final não trouxe envelope JSON válido; envelope reconstruído "
                 "da chamada de gravação."))
 
-    resultado.problemas.extend(auditor.problemas_de_chamadas(escopo))
+    problemas_de_chamadas = auditor.problemas_de_chamadas(escopo)
+    if resultado.falha_de_configuracao and not auditor.chamadas:
+        # O agente nem chegou a rodar: "salvar_resultado_bpr não foi
+        # chamada" seria culpar o agente pelo que é configuração. O erro já
+        # está em resultado.erro.
+        problemas_de_chamadas = [p for p in problemas_de_chamadas
+                                 if p.codigo != "sem_persistencia"]
+    resultado.problemas.extend(problemas_de_chamadas)
 
     if resultado.envelope is not None:
         resultado.problemas.extend(validar_envelope(

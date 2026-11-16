@@ -190,6 +190,7 @@ print(resumo.contagens())
 | `BPR_TOOLS_MODULE` | `agente_bpr.tools` | Schema e `salvar_resultado_bpr` |
 | `BPR_CONFIG_MODULE` | `agente_bpr.config` | Caminhos checados antes do lote |
 | `ORQ_MODEL_NAME` | `gemini-2.5-flash` | Modelo do orquestrador conversacional |
+| `BPR_THINKING_BUDGET` | `16384` | Raciocínio por chamada do Agente BPR; `-1` = dinâmico. Fora da faixa do modelo, vai para o limite mais próximo, com aviso |
 | `ORQ_SAIDA_DIR` | `./saida_orquestrador` | Pasta dos lotes |
 | `ORQ_TIMEOUT_POR_ENDERECO_S` | `1800` | Tempo máximo por endereço |
 | `ORQ_MAX_TENTATIVAS_ANALISE` | `2` | Tentativas quando nada foi gravado |
