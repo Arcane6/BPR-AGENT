@@ -1,0 +1,16 @@
+# Dependências de desenvolvimento e CI, com a versão escolhida. Produção
+# usa requirements.txt.
+#
+# Não é daqui que se instala: o requirements-dev.txt é o lock, com hash,
+# gerado a partir deste arquivo e preso às versões de produção (-c). Mudou
+# algo aqui ou no requirements.in? Regere os dois locks:
+#
+#   python -m uv pip compile requirements.in --universal --python-version 3.11 --generate-hashes -o requirements.txt
+#   python -m uv pip compile requirements-dev.in -c requirements.txt --universal --python-version 3.11 --generate-hashes -o requirements-dev.txt
+#
+-r requirements.in
+
+pytest==8.4.2
+# TestClient do FastAPI (tests/test_servidor.py).
+httpx==0.28.1
+ruff==0.16.8

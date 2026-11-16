@@ -1,0 +1,141 @@
+[
+ {
+  "codigo": "ETAPA_01_ACAO_01_CONSISTENCIA_DETENTOR",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "1.1",
+  "titulo": "Consistência de detentor"
+ },
+ {
+  "codigo": "ETAPA_01_ACAO_02_CONSISTENCIA_ADICIONAIS",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "1.2",
+  "titulo": "Consistência de adicionais"
+ },
+ {
+  "codigo": "ETAPA_02_ACAO_01_VIGENCIA_CONTRATUAL",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "2.1",
+  "titulo": "Vigência contratual"
+ },
+ {
+  "codigo": "ETAPA_02_ACAO_02_ADICIONAIS_REDUTIVEIS",
+  "depende_de": [
+   "1.1",
+   "1.2",
+   "2.1"
+  ],
+  "efeito_colateral": false,
+  "rotulo": "2.2",
+  "titulo": "Adicionais redutíveis"
+ },
+ {
+  "codigo": "ETAPA_03_ACAO_01_SITUACAO_FINANCEIRA",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "3.1",
+  "titulo": "Situação financeira"
+ },
+ {
+  "codigo": "ETAPA_03_ACAO_02_SITUACAO_OPERACIONAL",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "3.2",
+  "titulo": "Situação operacional"
+ },
+ {
+  "codigo": "ETAPA_03_ACAO_03_FOCO_DA_ANALISE",
+  "depende_de": [
+   "3.1",
+   "3.2"
+  ],
+  "efeito_colateral": false,
+  "rotulo": "3.3",
+  "titulo": "Foco da análise"
+ },
+ {
+  "codigo": "ETAPA_03_ACAO_04_CASOS_PARA_DISTRATO",
+  "depende_de": [
+   "3.2"
+  ],
+  "efeito_colateral": false,
+  "rotulo": "3.4",
+  "titulo": "Casos para distrato"
+ },
+ {
+  "codigo": "ETAPA_04_ACAO_01_AVALIACAO_ULTIMA_SCI",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "4.1",
+  "titulo": "Última SCI"
+ },
+ {
+  "codigo": "ETAPA_04_ACAO_02_FRANQUIA_E_OCUPACAO",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "4.2",
+  "titulo": "Franquia e ocupação de AEV"
+ },
+ {
+  "codigo": "ETAPA_05_ACAO_01_CONSULTAR_TSSRS_DISPONIVEIS",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "5.1",
+  "titulo": "TSSRs disponíveis"
+ },
+ {
+  "codigo": "ETAPA_05_ACAO_02_COMPARAR_TSSRS_DISPONIVEIS_E_EXTRAIDOS",
+  "depende_de": [
+   "5.1"
+  ],
+  "efeito_colateral": false,
+  "rotulo": "5.2",
+  "titulo": "Comparar disponíveis e extraídos"
+ },
+ {
+  "codigo": "ETAPA_05_ACAO_02B_VERIFICAR_E_PROCESSAR_TSSR_INPUT",
+  "depende_de": [
+   "5.2"
+  ],
+  "efeito_colateral": true,
+  "rotulo": "5.2B",
+  "titulo": "Localizar e extrair TSSR pendente"
+ },
+ {
+  "codigo": "ETAPA_05_ACAO_03_CONSULTAR_EQUIPAMENTOS_TSSR",
+  "depende_de": [
+   "5.2"
+  ],
+  "efeito_colateral": false,
+  "rotulo": "5.3",
+  "titulo": "Equipamentos do TSSR extraído"
+ },
+ {
+  "codigo": "ETAPA_06_ACAO_01_VERIFICAR_LIMITE_RF_POR_TECNOLOGIA",
+  "depende_de": [
+   "5.3"
+  ],
+  "efeito_colateral": false,
+  "rotulo": "6.1",
+  "titulo": "Limite de RF por tecnologia"
+ },
+ {
+  "codigo": "ETAPA_06_ACAO_02_CONSULTAR_E_CLASSIFICAR_ENLACES_TX",
+  "depende_de": [],
+  "efeito_colateral": false,
+  "rotulo": "6.2",
+  "titulo": "Enlaces de transmissão"
+ },
+ {
+  "codigo": "ETAPA_06_ACAO_03_CRUZAR_TX_TSSR_COM_ENLACES",
+  "depende_de": [
+   "5.3",
+   "6.2"
+  ],
+  "efeito_colateral": false,
+  "rotulo": "6.3",
+  "titulo": "Cruzamento TX x enlaces"
+ }
+]

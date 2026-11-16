@@ -125,3 +125,9 @@ body {
   overflow: visible;
   text-overflow: clip;
 }
+
+/* Imagem escrita pelo modelo não é carregada (RespostaDoModelo.tsx). */
+.bpr-imagem-removida {
+  color: var(--mantine-color-dimmed);
+  font-style: italic;
+}

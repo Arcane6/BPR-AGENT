@@ -1,0 +1,102 @@
+{
+ "encontrado": {
+  "codificacao_utilizada": "utf-8-sig",
+  "enderecoid": "ACACLD0001",
+  "enlaces_fibrados": [
+   {
+    "aev_sem_ca": 0.3,
+    "azimute": 120.0,
+    "distancia": 1.5,
+    "endid": "ACACLD0001",
+    "enlace_id": "E1",
+    "plano": "P1",
+    "situacao": "ENLACE FIBRADO",
+    "situacao_resumida": "FIBRADO",
+    "tamanho_antena": 0.6
+   }
+  ],
+  "enlaces_nao_fibrados": [
+   {
+    "aev_sem_ca": null,
+    "azimute": 90.0,
+    "distancia": 2.0,
+    "endid": "ACACLD0001",
+    "enlace_id": "E3",
+    "plano": "P3",
+    "situacao": "ENLACE NÃO FIBRADO",
+    "situacao_resumida": "NAO_FIBRADO",
+    "tamanho_antena": null
+   },
+   {
+    "aev_sem_ca": 2.5,
+    "azimute": null,
+    "distancia": null,
+    "endid": "ACACLD0001",
+    "enlace_id": "E4",
+    "plano": "P4",
+    "situacao": "ENLACE NAO FIBRADO",
+    "situacao_resumida": "NAO_FIBRADO",
+    "tamanho_antena": 1.8
+   }
+  ],
+  "enlaces_outros": [
+   {
+    "aev_sem_ca": null,
+    "azimute": 10.0,
+    "distancia": 7.0,
+    "endid": "ACACLD0001",
+    "enlace_id": "E5",
+    "plano": "P5",
+    "situacao": "DESATIVADO",
+    "situacao_resumida": "OUTROS",
+    "tamanho_antena": null
+   }
+  ],
+  "enlaces_parciais": [
+   {
+    "aev_sem_ca": 1.1,
+    "azimute": 45.0,
+    "distancia": 3.0,
+    "endid": "acacld0001",
+    "enlace_id": "E2",
+    "plano": "P2",
+    "situacao": "Enlace Parcialmente Fibrado",
+    "situacao_resumida": "PARCIAL",
+    "tamanho_antena": 1.2
+   }
+  ],
+  "quantidade_enlaces": 5,
+  "quantidade_fibrados": 1,
+  "quantidade_nao_fibrados": 2,
+  "quantidade_outros": 1,
+  "quantidade_parciais": 1,
+  "quantidade_sem_diametro": 2,
+  "status": "encontrado",
+  "total_aev_enlaces": 3.9,
+  "total_aev_fibrados": 0.3,
+  "total_aev_nao_fibrados": 2.5,
+  "total_aev_parciais": 1.1
+ },
+ "nao_encontrado": {
+  "enderecoid": "ACACLD0009",
+  "enlaces_fibrados": [],
+  "enlaces_nao_fibrados": [],
+  "enlaces_outros": [],
+  "enlaces_parciais": [],
+  "quantidade_enlaces": 0,
+  "quantidade_fibrados": 0,
+  "quantidade_nao_fibrados": 0,
+  "quantidade_outros": 0,
+  "quantidade_parciais": 0,
+  "quantidade_sem_diametro": 0,
+  "status": "nao_encontrado",
+  "total_aev_enlaces": 0.0,
+  "total_aev_fibrados": 0.0,
+  "total_aev_nao_fibrados": 0.0,
+  "total_aev_parciais": 0.0
+ },
+ "vazio": {
+  "motivo": "ENDERECO_ID não informado.",
+  "status": "erro"
+ }
+}

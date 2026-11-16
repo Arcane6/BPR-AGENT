@@ -28,14 +28,24 @@ Guardas de servidor local, sem login:
 - POST exige o cabeçalho X-BPR-Local. Página de outro site não manda
   cabeçalho próprio sem CORS, e aqui não há CORS: um link ou formulário
   malicioso não dispara análise nem extração.
-- um lote por vez no processo (orquestrador_bpr.lote.LoteEmAndamento).
+- vários lotes em paralelo, até ORQ_MAX_LOTES_SIMULTANEOS; Excel, extração
+  e endereço têm trava entre processos (orquestrador_bpr/lote.py).
+
+Proteções pedidas pela segurança (docs/SEGURANCA.md), no middleware:
+- toda requisição ganha um request_id (volta no X-Request-ID), uma linha
+  de log e, fora as consultas que a tela repete em laço, uma linha na
+  trilha de auditoria selada (seguranca_bpr.auditoria);
+- limite de requisições por minuto (BPR_LIMITE_API_POR_MINUTO), 429 acima;
+- cabeçalhos de segurança e CSP em toda resposta (seguranca_bpr.cabecalhos).
 """
 
 from __future__ import annotations
 
 import asyncio
+import logging
 import tempfile
 import time
+import uuid
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -49,7 +59,7 @@ from pydantic import BaseModel, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from orquestrador_bpr import config
+from orquestrador_bpr import config, consumo
 from orquestrador_bpr.catalogo_acoes import (
     AcaoDesconhecida,
     catalogo_para_exibicao,
@@ -62,11 +72,16 @@ from orquestrador_bpr.lote import (
     ResumoLote,
     executar_lote,
     ler_arquivo_enderecos,
-    lote_em_andamento,
+    lotes_em_andamento,
     normalizar_enderecos,
     novo_lote_id,
 )
 from orquestrador_bpr.preflight import verificar_ambiente
+from seguranca_bpr import auditoria
+from seguranca_bpr import config as seguranca
+from seguranca_bpr.cabecalhos import cabecalhos
+from seguranca_bpr.limites import LimiteDeTaxa, UsoNegado
+from seguranca_bpr.logs import request_id
 
 from . import registros
 from .conversa import Conversas, SessaoOcupada
@@ -77,6 +92,27 @@ CABECALHO_LOCAL = "X-BPR-Local"
 HOSTS_LOCAIS = ["127.0.0.1", "localhost"]
 MAX_ENDERECOS_POR_LOTE = 5000
 MAX_BYTES_ARQUIVO = 2 * 1024 * 1024
+
+log = logging.getLogger("servidor_bpr")
+
+# GET que a tela repete a cada poucos segundos enquanto acompanha um lote
+# ou uma conversa. Vão para o log, não para a trilha: uma aba aberta
+# encheria a trilha de linhas iguais sem dizer nada novo. O que abriu a
+# tela, o que mudou algo e todo arquivo baixado continuam na trilha.
+_ACOMPANHAMENTO = ("/api/saude", "/api/lotes")
+_ACOMPANHAMENTO_PREFIXO = ("/api/conversas/",)
+
+
+def _so_acompanhamento(metodo: str, caminho: str) -> bool:
+    if metodo != "GET":
+        return False
+    if caminho in _ACOMPANHAMENTO:
+        return True
+    partes = caminho.strip("/").split("/")
+    # /api/lotes/{id}, sem nada depois: o progresso do lote.
+    if len(partes) == 3 and partes[:2] == ["api", "lotes"]:
+        return True
+    return caminho.startswith(_ACOMPANHAMENTO_PREFIXO) and caminho.count("/") == 3
 
 
 # ---------------------------------------------------------------------------
@@ -96,7 +132,9 @@ class PedidoLote(PedidoEscopo):
 
 
 class Mensagem(BaseModel):
-    texto: str = Field(min_length=1, max_length=4000)
+    # Teto no servidor, que a tela não substitui: quem chama a rota direto
+    # passa por cima de qualquer limite do front (item N5).
+    texto: str = Field(min_length=1, max_length=seguranca.LIMITE_MENSAGEM_CHARS)
 
 
 # ---------------------------------------------------------------------------
@@ -182,11 +220,14 @@ def criar_app(
 
     @asynccontextmanager
     async def ciclo(app: FastAPI):
+        auditoria.registrar_protecoes("protecoes_ao_subir", origem="tela")
         yield
         for lote in rodando.values():
             lote.parar = True
         if estado["conversas"] is not None:
             await estado["conversas"].encerrar()
+        auditoria.registrar_protecoes("protecoes_ao_descer", origem="tela")
+        auditoria.TRILHA.ancorar()
 
     app = FastAPI(title="Agente BPR", lifespan=ciclo, docs_url="/api/docs",
                   openapi_url="/api/openapi.json", redoc_url=None)
@@ -200,6 +241,52 @@ def criar_app(
                 "detail": f"Requisição sem o cabeçalho {CABECALHO_LOCAL}."})
         return await chamar(request)
 
+    limite_api = LimiteDeTaxa(seguranca.LIMITE_API_POR_MINUTO, 60)
+
+    # Registrado por último, roda primeiro: envolve as outras guardas, e a
+    # recusa por cabeçalho ou por Host também sai com id, log e trilha.
+    @app.middleware("http")
+    async def proteger_e_registrar(request: Request, chamar):
+        inicio = time.perf_counter()
+        caminho = request.url.path
+        ip = request.client.host if request.client else ""
+        token_id = request_id.set(uuid.uuid4().hex[:16])
+        token_terminal = auditoria.terminal.set({
+            "ip": ip, "user_agent": request.headers.get("user-agent", "")[:200]})
+        try:
+            if caminho.startswith("/api/"):
+                permitido, espera = limite_api.permitir(ip)
+                if not permitido:
+                    auditoria.registrar("uso_negado", motivo="limite_de_requisicoes",
+                                        rota=caminho)
+                    resposta = JSONResponse(
+                        status_code=429, headers={"Retry-After": str(espera)},
+                        content={"detail": "Muitas requisições em sequência. Tente de "
+                                           f"novo em {espera} s."})
+                else:
+                    resposta = await chamar(request)
+            else:
+                resposta = await chamar(request)
+        except Exception:
+            log.exception("Erro na requisição", extra={"metodo": request.method,
+                                                       "rota": caminho})
+            resposta = JSONResponse(status_code=500, content={
+                "detail": f"Erro interno. Procure no log pelo id {request_id.get()}."})
+        duracao_ms = round((time.perf_counter() - inicio) * 1000)
+        for nome, valor in cabecalhos(caminho).items():
+            resposta.headers.setdefault(nome, valor)
+        resposta.headers["X-Request-ID"] = request_id.get()
+        if caminho.startswith("/api/"):
+            log.info("Requisição", extra={"metodo": request.method, "rota": caminho,
+                                          "status": resposta.status_code,
+                                          "duracao_ms": duracao_ms})
+            if not _so_acompanhamento(request.method, caminho):
+                auditoria.registrar("requisicao", metodo=request.method, rota=caminho,
+                                    status=resposta.status_code, duracao_ms=duracao_ms)
+        auditoria.terminal.reset(token_terminal)
+        request_id.reset(token_id)
+        return resposta
+
     # ------------------------------------------------------------------
     # Catálogo e ambiente
     # ------------------------------------------------------------------
@@ -208,11 +295,20 @@ def criar_app(
     def saude() -> dict:
         from agente_bpr.config import MODEL_NAME
 
-        ativo = next((lote.lote_id for lote in rodando.values() if lote.ativo), None)
+        da_tela = sorted(lote.lote_id for lote in rodando.values() if lote.ativo)
+        fora = [lote_id for lote_id in lotes_em_andamento() if lote_id not in da_tela]
         return {"status": "ok", "modelo_agente": MODEL_NAME,
                 "modelo_orquestrador": config.ORQ_MODEL_NAME, "saida_dir": str(saida),
-                "lote_em_andamento": ativo,
-                "lote_fora_da_tela": lote_em_andamento() and ativo is None}
+                "lotes_em_andamento": da_tela,
+                # Rodando neste processo sem ter sido começados pela tela (chat).
+                "lotes_fora_da_tela": len(fora),
+                "max_lotes_simultaneos": config.ORQ_MAX_LOTES_SIMULTANEOS}
+
+    def _ativos() -> set[str]:
+        # O lote entra em lotes_em_andamento() só quando a tarefa começa a
+        # rodar; o da tela conta desde o pedido, para dois cliques seguidos
+        # não passarem os dois do teto.
+        return set(lotes_em_andamento()) | {lote.lote_id for lote in rodando.values() if lote.ativo}
 
     @app.get("/api/acoes")
     def acoes() -> dict:
@@ -245,6 +341,10 @@ def criar_app(
             except (ValueError, UnicodeDecodeError) as exc:
                 raise HTTPException(400, f"Não foi possível ler o arquivo: {exc}") from exc
         unicos, repetidos = normalizar_enderecos(valores)
+        # Arquivo acessado (N1): o tamanho e quantos endereços, não o nome
+        # nem o conteúdo.
+        auditoria.registrar("arquivo_recebido", formato=sufixo.lstrip("."),
+                            bytes=len(conteudo), enderecos=len(unicos))
         return {"enderecos": unicos, "repetidos": repetidos}
 
     # ------------------------------------------------------------------
@@ -260,8 +360,14 @@ def criar_app(
             resolver_escopo(pedido.acoes, pedido.permitir_extracao)
         except AcaoDesconhecida as exc:
             raise HTTPException(400, str(exc)) from exc
-        if lote_em_andamento() or any(lote.ativo for lote in rodando.values()):
-            raise HTTPException(409, "Já existe um lote em execução. Espere ele terminar.")
+        if len(_ativos()) >= config.ORQ_MAX_LOTES_SIMULTANEOS:
+            raise HTTPException(409, (
+                f"Já há {len(_ativos())} lotes em execução, o máximo ao mesmo tempo "
+                "(ORQ_MAX_LOTES_SIMULTANEOS). Espere um terminar."))
+        teto = await asyncio.to_thread(consumo.teto_atingido) if consumo.teto_ligado() else None
+        if teto:
+            auditoria.registrar("uso_negado", motivo="teto_de_tokens", rota="/api/lotes")
+            raise HTTPException(429, teto)
         impedimentos, _ = verificar(pedido.permitir_extracao)
         if impedimentos:
             raise HTTPException(400, {"motivo": "Ambiente não está pronto.",
@@ -292,9 +398,9 @@ def criar_app(
                     saida_dir=saida, fabrica=fabrica, campos_schema=campos_schema,
                     salvar=salvar, ao_concluir=ao_concluir, lote_id=lote.lote_id,
                     ao_comecar=ao_comecar, deve_parar=lambda: lote.parar,
-                    ao_progresso=lote.andamento,
+                    ao_progresso=lote.andamento, origem="tela",
                     **(opcoes_executor or {}))
-            except LoteEmAndamento as exc:
+            except (LoteEmAndamento, UsoNegado) as exc:
                 lote.erro = str(exc)
             except Exception as exc:  # aparece na tela, não some no log
                 lote.erro = f"{type(exc).__name__}: {exc}"
@@ -379,6 +485,7 @@ def criar_app(
         if lote is None or not lote.ativo:
             raise HTTPException(409, "O lote não está em execução nesta tela.")
         lote.parar = True
+        auditoria.registrar("lote_parada_pedida", lote_id=lote_id)
         return {"situacao": "parando"}
 
     @app.get("/api/lotes/{lote_id}/enderecos/{execution_id}")
@@ -392,6 +499,9 @@ def criar_app(
         if formato not in FORMATOS:
             raise HTTPException(400, f"Formato deve ser um de: {', '.join(FORMATOS)}.")
         conteudo = exportar(conteudo_registros, formato, schema())
+        # Arquivo gerado e entregue (N1, arquivos acessados).
+        auditoria.registrar("arquivo_exportado", arquivo=f"{nome}.{formato}",
+                            linhas=len(conteudo_registros), bytes=len(conteudo))
         return Response(conteudo, media_type=FORMATOS[formato], headers={
             "Content-Disposition": f'attachment; filename="{nome}.{formato}"'})
 
@@ -421,6 +531,14 @@ def criar_app(
     async def nova_conversa() -> dict:
         return (await conversas().criar()).como_dict()
 
+    # A mensagem gasta modelo: o teto do mês vale antes de ela entrar.
+    async def _teto_da_conversa() -> None:
+        teto = await asyncio.to_thread(consumo.teto_atingido) if consumo.teto_ligado() else None
+        if teto:
+            auditoria.registrar("uso_negado", motivo="teto_de_tokens",
+                                rota="/api/conversas")
+            raise HTTPException(429, teto)
+
     def _sessao(sessao_id: str):
         sessao = conversas().obter(sessao_id)
         if sessao is None:
@@ -430,10 +548,13 @@ def criar_app(
     @app.post("/api/conversas/{sessao_id}/mensagens", status_code=202)
     async def enviar(sessao_id: str, mensagem: Mensagem) -> dict:
         sessao = _sessao(sessao_id)
+        await _teto_da_conversa()
         try:
             conversas().enviar(sessao, mensagem.texto.strip())
         except SessaoOcupada as exc:
             raise HTTPException(409, str(exc)) from exc
+        except UsoNegado as exc:
+            raise HTTPException(429, str(exc)) from exc
         return sessao.como_dict()
 
     @app.get("/api/conversas/{sessao_id}")

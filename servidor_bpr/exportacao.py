@@ -7,6 +7,9 @@
 - csv: o mesmo resumo.csv do lote, com ponto e vírgula, para o Excel em
   português abrir direto.
 - json: os registros completos do resultados.jsonl.
+
+Texto do modelo não vira fórmula em nenhum dos dois formatos de planilha
+(seguranca_bpr/planilha.py).
 """
 
 from __future__ import annotations
@@ -23,6 +26,7 @@ from agente_bpr.config import EXCEL_CELL_TEXT_LIMIT
 from agente_bpr.ferramentas.comum import celula_a_partir_de
 from orquestrador_bpr.executor import ResultadoEndereco
 from orquestrador_bpr.lote import escrever_csv_resumo, tabela_resumo
+from seguranca_bpr.planilha import proteger_linha
 
 FORMATOS = {
     "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -48,6 +52,7 @@ def _aba(wb: Workbook, titulo: str, colunas: list[str], linhas: list[list[Any]])
         celula.font, celula.fill = _CABECALHO, _FUNDO
     for linha in linhas:
         ws.append([_celula(v) for v in linha])
+        proteger_linha(ws[ws.max_row])
     ws.freeze_panes = "B2"
     if linhas:
         ws.auto_filter.ref = ws.dimensions

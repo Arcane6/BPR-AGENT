@@ -1,0 +1,42 @@
+{
+ "cargas": [],
+ "consultas": [
+  {
+   "parametros": {
+    "file_name": "TSSR OC 875367 RBOAJ7.XLSX"
+   },
+   "sql": "\n        SELECT DISTINCT FileName\n        FROM `projeto-teste.dataset_teste.AEV_TSSR_InfoSites`\n        WHERE UPPER(TRIM(CAST(FileName AS STRING))) = @file_name\n    "
+  },
+  {
+   "parametros": {
+    "file_name": "TSSR OC 875367 RBOAJ7.XLSX"
+   },
+   "sql": "\n        SELECT DISTINCT FileName\n        FROM `projeto-teste.dataset_teste.AEV_TSSR_Equipamentos`\n        WHERE UPPER(TRIM(CAST(FileName AS STRING))) = @file_name\n    "
+  }
+ ],
+ "destino": [
+  "Error/TSSR OC 875367 RBOAJ7.xlsx"
+ ],
+ "log": [
+  {
+   "Arquivo": "TSSR OC 875367 RBOAJ7.XLSX",
+   "DetentorEV": "TORRES SA",
+   "EndId": "ACACLD0001",
+   "Mensagem": "Divergencia de colunas em EXISTENTE",
+   "Status": "Troca de colunas em Equipamentos"
+  },
+  {
+   "Arquivo": "TSSR OC 875367 RBOAJ7.XLSX",
+   "DetentorEV": "TORRES SA",
+   "EndId": "ACACLD0001",
+   "Mensagem": "Extração com um dos dataframes zerados: infosites 1, equip 0",
+   "Status": "Extrações zeradas"
+  }
+ ],
+ "resposta": {
+  "arquivo_permanece_no_input": null,
+  "movido_para": "Error",
+  "resultado": "PROCESSAMENTO_REPROVADO",
+  "status": "concluido_com_erro"
+ }
+}

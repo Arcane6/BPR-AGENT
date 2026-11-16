@@ -10,6 +10,9 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from seguranca_bpr import config as seguranca
+from seguranca_bpr.travas import trava
+
 from .config import (
     BIGQUERY_PROJECT_ID,
     BIGQUERY_TSSR_EQUIPAMENTOS_TABLE,
@@ -160,6 +163,32 @@ def processar_tssr_disponibilizado(
     O arquivo deve estar dentro da pasta Input e possuir extensão
     .xlsx ou .xlsm.
     """
+    # Uma extração por vez na máquina, entre lotes e processos: o extrator
+    # usa o log e as bases dele em comum (seguranca_bpr/travas.py). A
+    # declaração que o modelo lê é esta assinatura e esta docstring, iguais
+    # às de antes; o trabalho está em _processar_tssr.
+    trava_extracao = trava("extracao-tssr", seguranca.ESPERA_TRAVA_EXTRACAO_S)
+    if not trava_extracao.adquirir():
+        return {
+            "status": "erro",
+            "resultado": "EXTRACAO_EM_ANDAMENTO",
+            "arquivo": Path(str(caminho_arquivo or "")).name,
+            "arquivo_permanece_no_input": True,
+            "motivo": (
+                "Outra extração de TSSR está em andamento (outro lote ou processo) há mais "
+                f"de {seguranca.ESPERA_TRAVA_EXTRACAO_S} s. O arquivo continua no Input."),
+        }
+    try:
+        return _processar_tssr(caminho_arquivo)
+    finally:
+        trava_extracao.liberar()
+
+
+def _processar_tssr(
+    caminho_arquivo: str,
+) -> dict[str, Any]:
+    """O trabalho de processar_tssr_disponibilizado, já com a trava."""
+
 
     caminho_informado = str(caminho_arquivo or "").strip()
 

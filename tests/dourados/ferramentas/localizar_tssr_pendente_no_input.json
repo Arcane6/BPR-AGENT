@@ -1,0 +1,198 @@
+{
+ "nome_vazio": {
+  "arquivo_candidato": null,
+  "caminho_candidato": null,
+  "candidatos": [],
+  "extensao_candidato": null,
+  "formato_processavel": null,
+  "motivo": "Nome do TSSR não informado.",
+  "nome_tssr_procurado": null,
+  "recomendacao": null,
+  "resultado": "DADOS_INSUFICIENTES",
+  "similaridade": null,
+  "status": "erro",
+  "tipo_correspondencia": null
+ },
+ "pasta_vazia": {
+  "arquivo_candidato": null,
+  "caminho_candidato": null,
+  "candidatos": [],
+  "extensao_candidato": null,
+  "formato_processavel": false,
+  "nome_tssr_procurado": "TSSR OC 875367 RBOAJ7",
+  "pasta_input": "<DADOS>/TSSR/Input",
+  "quantidade_arquivos_input": 0,
+  "quantidade_candidatos": 0,
+  "recomendacao": "Disponibilizar o TSSR mais recente na pasta de input em formato XLSX.",
+  "resultado": "SOLICITAR_ARQUIVO_XLSX",
+  "similaridade": null,
+  "status": "nao_encontrado",
+  "tipo_correspondencia": null
+ },
+ "pronto": {
+  "arquivo_candidato": "TSSR_OC875367_SITE_RBOAJ7_REV_B.xlsx",
+  "caminho_candidato": "<DADOS>/TSSR/Input/TSSR_OC875367_SITE_RBOAJ7_REV_B.xlsx",
+  "candidatos": [
+   {
+    "arquivo": "TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+    "caminho": "<DADOS>/TSSR/Input/TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+    "divergencia_oc": false,
+    "extensao": ".zip",
+    "formato_processavel": false,
+    "mesma_oc": true,
+    "numeros_compartilhados": [
+     "875367",
+     "RBOAJ7"
+    ],
+    "similaridade": 1.0,
+    "tipo_correspondencia": "MESMO_NOME_SEM_EXTENSAO",
+    "tokens_compartilhados": [
+     "875367",
+     "B",
+     "OC",
+     "RBOAJ7",
+     "REV",
+     "SITE",
+     "TSSR"
+    ]
+   },
+   {
+    "arquivo": "TSSR_OC875367_SITE_RBOAJ7_REV_B.xlsx",
+    "caminho": "<DADOS>/TSSR/Input/TSSR_OC875367_SITE_RBOAJ7_REV_B.xlsx",
+    "divergencia_oc": false,
+    "extensao": ".xlsx",
+    "formato_processavel": true,
+    "mesma_oc": true,
+    "numeros_compartilhados": [
+     "RBOAJ7"
+    ],
+    "similaridade": 0.8732,
+    "tipo_correspondencia": "APROXIMADA_COM_MESMA_OC",
+    "tokens_compartilhados": [
+     "B",
+     "RBOAJ7",
+     "REV",
+     "SITE",
+     "TSSR"
+    ]
+   }
+  ],
+  "divergencia_oc": false,
+  "extensao_candidato": ".xlsx",
+  "formato_processavel": true,
+  "melhor_candidato_geral": {
+   "arquivo": "TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+   "caminho": "<DADOS>/TSSR/Input/TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+   "divergencia_oc": false,
+   "extensao": ".zip",
+   "formato_processavel": false,
+   "mesma_oc": true,
+   "numeros_compartilhados": [
+    "875367",
+    "RBOAJ7"
+   ],
+   "similaridade": 1.0,
+   "tipo_correspondencia": "MESMO_NOME_SEM_EXTENSAO",
+   "tokens_compartilhados": [
+    "875367",
+    "B",
+    "OC",
+    "RBOAJ7",
+    "REV",
+    "SITE",
+    "TSSR"
+   ]
+  },
+  "mesma_oc": true,
+  "nome_tssr_procurado": "TSSR OC 875367 SITE RBOAJ7 REV B.msg",
+  "pasta_input": "<DADOS>/TSSR/Input",
+  "quantidade_arquivos_input": 4,
+  "quantidade_candidatos": 2,
+  "recomendacao": null,
+  "resultado": "PRONTO_PARA_PROCESSAMENTO",
+  "similaridade": 0.8732,
+  "status": "encontrado",
+  "tipo_correspondencia": "APROXIMADA_COM_MESMA_OC"
+ },
+ "sem_candidato": {
+  "arquivo_candidato": null,
+  "caminho_candidato": null,
+  "candidatos": [],
+  "extensao_candidato": null,
+  "formato_processavel": false,
+  "nome_tssr_procurado": "Projeto completamente diferente",
+  "pasta_input": "<DADOS>/TSSR/Input",
+  "quantidade_arquivos_input": 3,
+  "quantidade_candidatos": 0,
+  "recomendacao": "Disponibilizar o TSSR mais recente na pasta de input em formato XLSX.",
+  "resultado": "SOLICITAR_ARQUIVO_XLSX",
+  "similaridade": null,
+  "status": "nao_encontrado",
+  "tipo_correspondencia": null
+ },
+ "so_formato_nao_processavel": {
+  "arquivo_candidato": "TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+  "caminho_candidato": "<DADOS>/TSSR/Input/TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+  "candidatos": [
+   {
+    "arquivo": "TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+    "caminho": "<DADOS>/TSSR/Input/TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+    "divergencia_oc": false,
+    "extensao": ".zip",
+    "formato_processavel": false,
+    "mesma_oc": true,
+    "numeros_compartilhados": [
+     "875367",
+     "RBOAJ7"
+    ],
+    "similaridade": 1.0,
+    "tipo_correspondencia": "MESMO_NOME_SEM_EXTENSAO",
+    "tokens_compartilhados": [
+     "875367",
+     "B",
+     "OC",
+     "RBOAJ7",
+     "REV",
+     "SITE",
+     "TSSR"
+    ]
+   }
+  ],
+  "divergencia_oc": false,
+  "extensao_candidato": ".zip",
+  "formato_processavel": false,
+  "melhor_candidato_geral": {
+   "arquivo": "TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+   "caminho": "<DADOS>/TSSR/Input/TSSR OC 875367 SITE RBOAJ7 Rev B.zip",
+   "divergencia_oc": false,
+   "extensao": ".zip",
+   "formato_processavel": false,
+   "mesma_oc": true,
+   "numeros_compartilhados": [
+    "875367",
+    "RBOAJ7"
+   ],
+   "similaridade": 1.0,
+   "tipo_correspondencia": "MESMO_NOME_SEM_EXTENSAO",
+   "tokens_compartilhados": [
+    "875367",
+    "B",
+    "OC",
+    "RBOAJ7",
+    "REV",
+    "SITE",
+    "TSSR"
+   ]
+  },
+  "mesma_oc": true,
+  "nome_tssr_procurado": "TSSR OC 875367 SITE RBOAJ7 REV B.msg",
+  "pasta_input": "<DADOS>/TSSR/Input",
+  "quantidade_arquivos_input": 3,
+  "quantidade_candidatos": 1,
+  "recomendacao": "Foi localizado um arquivo candidato, mas o formato não é XLSX nem XLSM. Disponibilizar o TSSR correspondente na pasta de input em formato XLSX.",
+  "resultado": "FORMATO_NAO_PROCESSAVEL",
+  "similaridade": 1.0,
+  "status": "encontrado",
+  "tipo_correspondencia": "MESMO_NOME_SEM_EXTENSAO"
+ }
+}

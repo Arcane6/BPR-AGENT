@@ -11,9 +11,12 @@ export type Saude = {
   modelo_agente: string;
   modelo_orquestrador: string;
   saida_dir: string;
-  lote_em_andamento: string | null;
-  /** Há lote rodando no processo que não foi começado pela tela (chat). */
-  lote_fora_da_tela: boolean;
+  /** Lotes começados pela tela e ainda rodando (vários podem rodar juntos). */
+  lotes_em_andamento: string[];
+  /** Lotes rodando no processo que não foram começados pela tela (chat). */
+  lotes_fora_da_tela: number;
+  /** Teto de lotes ao mesmo tempo no servidor (ORQ_MAX_LOTES_SIMULTANEOS). */
+  max_lotes_simultaneos: number;
 };
 
 export type Acao = {

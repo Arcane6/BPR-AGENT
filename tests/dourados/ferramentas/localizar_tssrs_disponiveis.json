@@ -1,0 +1,36 @@
+{
+ "encontrado": {
+  "documentos": [
+   {
+    "caminho": "\\\\srv\\tssr\\a.xlsx",
+    "data_criacao": "2025-03-10",
+    "oc": "875367"
+   },
+   {
+    "caminho": "\\\\srv\\tssr\\b.xlsx",
+    "data_criacao": "2024-01-05",
+    "oc": null
+   },
+   {
+    "caminho": "\\\\srv\\tssr\\d.xlsx",
+    "data_criacao": null,
+    "oc": "3"
+   }
+  ],
+  "enderecoid": "ACACLD0001",
+  "quantidade_documentos": 3,
+  "status": "encontrado",
+  "tipo": "TSSR"
+ },
+ "nao_encontrado": {
+  "documentos": [],
+  "enderecoid": "ACACLD0009",
+  "quantidade_documentos": 0,
+  "status": "nao_encontrado",
+  "tipo": "TSSR"
+ },
+ "vazio": {
+  "motivo": "ENDERECO_ID não informado.",
+  "status": "erro"
+ }
+}

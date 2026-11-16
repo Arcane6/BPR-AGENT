@@ -16,6 +16,7 @@ import webbrowser
 import uvicorn
 
 from orquestrador_bpr import config
+from seguranca_bpr import logs
 
 from .app import criar_app
 
@@ -29,6 +30,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--sem-navegador", action="store_true",
                         help="Não abre o navegador ao subir.")
     args = parser.parse_args(argv)
+    logs.configurar()
 
     endereco = f"http://{HOST}:{args.porta}/"
     if not args.sem_navegador:

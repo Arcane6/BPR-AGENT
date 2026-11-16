@@ -1,0 +1,44 @@
+{
+ "sem_base": {
+  "enderecoid": "ACACLD0001",
+  "enlaces_fibrados": [],
+  "enlaces_nao_fibrados": [],
+  "enlaces_outros": [],
+  "enlaces_parciais": [],
+  "motivo": "Base de enlaces de transmissão não encontrada: <DADOS>/Bases auxiliares/Base de enlaces ociosos.csv",
+  "quantidade_enlaces": null,
+  "quantidade_fibrados": null,
+  "quantidade_nao_fibrados": null,
+  "quantidade_outros": null,
+  "quantidade_parciais": null,
+  "quantidade_sem_diametro": null,
+  "status": "erro",
+  "total_aev_enlaces": null,
+  "total_aev_fibrados": null,
+  "total_aev_nao_fibrados": null,
+  "total_aev_parciais": null
+ },
+ "sem_colunas": {
+  "colunas_encontradas": [
+   "ENLACE ID",
+   "ENDID"
+  ],
+  "enderecoid": "ACACLD0001",
+  "enlaces_fibrados": [],
+  "enlaces_nao_fibrados": [],
+  "enlaces_outros": [],
+  "enlaces_parciais": [],
+  "motivo": "Colunas obrigatórias ausentes na base de enlaces: PLANO, TAMANHO_ANTENA, DISTANCIA, AZIMUTE, SITUAÇÃO",
+  "quantidade_enlaces": null,
+  "quantidade_fibrados": null,
+  "quantidade_nao_fibrados": null,
+  "quantidade_outros": null,
+  "quantidade_parciais": null,
+  "quantidade_sem_diametro": null,
+  "status": "erro",
+  "total_aev_enlaces": null,
+  "total_aev_fibrados": null,
+  "total_aev_nao_fibrados": null,
+  "total_aev_parciais": null
+ }
+}

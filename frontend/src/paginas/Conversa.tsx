@@ -20,13 +20,12 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
-import remarkGfm from "remark-gfm";
 
 import { ErroDaApi } from "../api/cliente";
 import { useConversa, useEnviarMensagem, useNovaConversa } from "../api/consultas";
 import type { MensagemConversa } from "../api/tipos";
+import { RespostaDoModelo } from "../componentes/RespostaDoModelo";
 import { Erro } from "../ui/Estado";
 import { loteDaResposta } from "./conversas";
 
@@ -109,9 +108,7 @@ function Mensagem({ mensagem }: { mensagem: MensagemConversa }) {
       bg={doUsuario ? "var(--mantine-primary-color-filled)" : "var(--bpr-superficie)"}
       c={doUsuario ? "white" : undefined}>
       {doUsuario ? <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>{mensagem.texto}</Text> : (
-        <div className="bpr-mensagem-markdown">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{mensagem.texto}</ReactMarkdown>
-        </div>
+        <RespostaDoModelo texto={mensagem.texto} />
       )}
     </Paper>
   );

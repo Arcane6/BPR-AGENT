@@ -67,5 +67,30 @@ ORQ_MAX_ENDERECOS_POR_CHAMADA = _int("ORQ_MAX_ENDERECOS_POR_CHAMADA", 20)
 # escuta só em 127.0.0.1: não há login, e ele dispara análises e extração.
 ORQ_SERVIDOR_PORTA = _int("ORQ_SERVIDOR_PORTA", 8765)
 
+# Lotes rodando ao mesmo tempo neste processo (tela e chat). Cada processo
+# (tela, linha de comando, adk web) tem o seu teto; o que protege o Excel,
+# a extração e o endereço entre processos são as travas de arquivo
+# (seguranca_bpr/travas.py).
+ORQ_MAX_LOTES_SIMULTANEOS = _int("ORQ_MAX_LOTES_SIMULTANEOS", 4)
+# Endereços em análise ao mesmo tempo no processo, somando todos os lotes:
+# é a conta que a cota do Vertex AI vê. A concorrência de cada lote vale
+# dentro deste teto.
+ORQ_MAX_ENDERECOS_SIMULTANEOS = _int("ORQ_MAX_ENDERECOS_SIMULTANEOS", 8)
+
+# Consumo de tokens (consumo.py): a mesma tabela do painel de consumo do
+# portal (coverage-hub), uma linha por endereço analisado e por turno de
+# conversa. Mesmos nomes de variável do .env do portal. Sem ORACLE_DSN, as
+# linhas esperam na fila local até o banco ser configurado.
+ORACLE_USER = _texto("ORACLE_USER", "")
+ORACLE_PASSWORD = _texto("ORACLE_PASSWORD", "")
+ORACLE_DSN = _texto("ORACLE_DSN", "")
+# Pasta do Instant Client, só para o modo thick (Oracle antigo ou NNE).
+# Vazio = modo thin, sem instalar nada.
+ORACLE_CLIENT_LIB_DIR = _texto("ORACLE_CLIENT_LIB_DIR", "")
+CONSUMO_TABELA = _texto("BPR_CONSUMO_TABELA", "NTW_OP.TB_PORTAL_CONSUMO_AGENTE")
+# Como o BPR aparece na coluna AGENTE da tabela (o painel agrupa por ela).
+CONSUMO_AGENTE_ENDERECO = "bpr"
+CONSUMO_AGENTE_CONVERSA = "bpr_orquestrador"
+
 APP_NAME = "orquestrador_bpr"
 USER_ID = _texto("ORQ_USER_ID", "orquestrador")

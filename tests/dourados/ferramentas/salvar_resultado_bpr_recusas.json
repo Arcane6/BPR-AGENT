@@ -1,0 +1,34 @@
+{
+ "cabecalho_divergente": {
+  "motivo": "Erro ao gravar resultado BPR: ValueError: O cabeçalho existente no arquivo de resultados é diferente do schema oficial. A gravação foi interrompida para evitar o desalinhamento das linhas existentes. Migre o arquivo atual ou utilize um novo arquivo de resultados.",
+  "status": "erro"
+ },
+ "chave_fora_do_schema": {
+  "motivo": "campos_resultado contém chaves fora do esquema oficial: ['CAMPO_INVENTADO']. Use somente os campos documentados em CAMPOS_RESULTADO_NEGOCIO.",
+  "status": "erro"
+ },
+ "nao_e_objeto": {
+  "motivo": "campos_resultado deve ser um objeto JSON (dicionário).",
+  "status": "erro"
+ },
+ "sem_endereco": {
+  "motivo": "ENDEREÇO ID não informado.",
+  "status": "erro"
+ },
+ "status_invalido": {
+  "motivo": "Status consolidado da execução inválido. Use somente: CONCLUIDA ou ERRO.",
+  "status": "erro"
+ },
+ "truncado": {
+  "aba": "RESULTADOS",
+  "arquivo": "<DADOS>/Resultado do Agente BPR.xlsx",
+  "campos_truncados": [
+   "CONCLUSAO_RESUMO"
+  ],
+  "enderecoid": "A",
+  "execution_id": "e",
+  "linha": 2,
+  "mensagem": "Resultado BPR registrado em uma única linha, um campo por coluna.",
+  "status": "registrado"
+ }
+}

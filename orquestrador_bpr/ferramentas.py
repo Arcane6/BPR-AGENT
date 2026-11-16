@@ -11,6 +11,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from seguranca_bpr.limites import UsoNegado
+
 from . import config
 from .catalogo_acoes import AcaoDesconhecida, catalogo_para_exibicao, resolver_escopo
 from .lote import LoteEmAndamento, executar_lote, linha_resumo
@@ -94,8 +96,9 @@ async def analisar_enderecos(
 
     try:
         resumo = await executar_lote(enderecos_validos, acoes=acoes or None,
-                                     permitir_extracao=permitir_extracao_tssr)
-    except LoteEmAndamento as exc:
+                                     permitir_extracao=permitir_extracao_tssr,
+                                     origem="conversa")
+    except (LoteEmAndamento, UsoNegado) as exc:
         return {"status": "recusado", "motivo": str(exc)}
     return {
         "status": "concluido",

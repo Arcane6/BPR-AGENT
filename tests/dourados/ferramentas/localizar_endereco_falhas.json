@@ -1,0 +1,18 @@
+{
+ "aba_sem_nome_base": {
+  "enderecoid": "ACACLD0001",
+  "status": "nao_encontrado"
+ },
+ "sem_base": {
+  "motivo": "Base não encontrada: <DADOS>/Base de dados do Agente BPR.xlsx",
+  "status": "erro"
+ },
+ "sem_coluna": {
+  "colunas_encontradas": [
+   "OUTRA",
+   "BH_Status"
+  ],
+  "motivo": "Coluna obrigatória ausente: ENDEREÇOID",
+  "status": "erro"
+ }
+}

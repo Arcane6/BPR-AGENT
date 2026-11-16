@@ -5,6 +5,8 @@ from google.adk.agents import Agent
 from google.genai import types
 from google.adk.planners import BuiltInPlanner
 
+from seguranca_bpr.injecao import REGRAS_DE_SEGURANCA
+
 from . import config
 from .config import MODEL_NAME, THINKING_BUDGET
 from .guardas import (
@@ -41,7 +43,10 @@ root_agent = Agent(
         "Recebe uma lista de ações solicitadas e parâmetros de negócio, consulta as fontes internas necessárias, executa as validações e os cálculos definidos nas regras operacionais e consolida os resultados em um único objeto JSON plano. "
         "Ao final, chama a ferramenta de persistência uma única vez, passando o objeto campos_resultado diretamente para gravação de uma única linha no Excel."
     ),
-    instruction=AGENT_INSTRUCTION,
+    # As regras de segurança vão no FIM: o começo é o prefixo que o cache
+    # da instrução aproveita (seguranca_bpr/injecao.py). O conteúdo de
+    # planilha, CSV e TSSR que as ferramentas devolvem é dado, não ordem.
+    instruction=AGENT_INSTRUCTION + REGRAS_DE_SEGURANCA,
     # Em thread, para não travar o event loop; em série dentro da mesma
     # execução, como antes (guardas.py).
     tools=[

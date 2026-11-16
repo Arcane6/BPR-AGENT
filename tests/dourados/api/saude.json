@@ -1,0 +1,9 @@
+{
+ "lotes_em_andamento": [],
+ "lotes_fora_da_tela": 0,
+ "max_lotes_simultaneos": 4,
+ "modelo_agente": "gemini-2.5-flash",
+ "modelo_orquestrador": "gemini-2.5-flash",
+ "saida_dir": "/caminho/saida_orquestrador",
+ "status": "ok"
+}

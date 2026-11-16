@@ -51,7 +51,9 @@ export function NovoLote() {
   const lerArquivo = useLerArquivoEnderecos();
   const iniciar = useIniciarLote();
 
-  const ocupado = Boolean(saude.data?.lote_em_andamento || saude.data?.lote_fora_da_tela);
+  // Vários lotes rodam juntos; só o teto do servidor impede um novo.
+  const rodando = (saude.data?.lotes_em_andamento.length ?? 0) + (saude.data?.lotes_fora_da_tela ?? 0);
+  const ocupado = Boolean(saude.data && rodando >= saude.data.max_lotes_simultaneos);
   const podeIniciar = unicos.length > 0 && !escopo.isError && ambiente.data?.pode_iniciar === true
     && !ocupado && !iniciar.isPending;
 
@@ -95,9 +97,15 @@ export function NovoLote() {
       </div>
 
       {ocupado && (
-        <Alert color="orange" icon={<i className="bi bi-hourglass-split" />} title="Já há um lote rodando">
-          Espere ele terminar: dois lotes juntos dividiriam o Excel de resultados e a pasta de
-          Input dos TSSRs.
+        <Alert color="orange" icon={<i className="bi bi-hourglass-split" />}
+          title={`Já há ${rodando} lotes rodando, o máximo ao mesmo tempo`}>
+          Espere um terminar para começar outro.
+        </Alert>
+      )}
+      {!ocupado && rodando > 0 && (
+        <Alert color="blue" variant="light" icon={<i className="bi bi-info-circle" />}>
+          {rodando === 1 ? "Há 1 lote rodando." : `Há ${rodando} lotes rodando.`} Este começa
+          junto com eles; um endereço que já esteja em análise em outro lote fica de lado.
         </Alert>
       )}
 

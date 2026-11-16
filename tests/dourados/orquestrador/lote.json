@@ -1,0 +1,158 @@
+{
+ "csv": [
+  "enderecoid;execution_id;localizacao;persistencia;persistencia_motivo;adicionais_redutiveis;ocupacao_acima_franquia;diferenca_aev;necessidade_extracao;rf_acima_limite;recomendacoes;qtd_divergencias;qtd_dados_insuficientes;conclusao_resumo;erros_contrato;alertas_coerencia;erro_execucao;tokens_entrada;duracao_s;acao_1.1;acao_1.2;acao_2.1;acao_2.2;acao_3.1;acao_3.2;acao_3.3;acao_3.4;acao_4.1;acao_4.2;acao_5.1;acao_5.2;acao_5.2B;acao_5.3;acao_6.1;acao_6.2;acao_6.3",
+  "ACACLD0001;<LOTE>-00001;ENCONTRADO;registrado;;;;;;;\"[\"\"Avaliar redução de AEV.\"\"]\";0;0;Resumo da análise.;[];[];;360000;0.0;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA;NAO_EXECUTADA;CONCLUIDA;CONCLUIDA;CONCLUIDA;CONCLUIDA",
+  "ACACLD0002;<LOTE>-00002;NAO_ENCONTRADO;registrado;;;;;;;[];0;0;Resumo da análise.;[];[];;360000;0.0;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA;NAO_EXECUTADA"
+ ],
+ "primeiro_registro_sem_envelope": {
+  "chamadas": [
+   {
+    "args": {},
+    "ferramenta": "obter_data_referencia",
+    "status": "concluido"
+   },
+   {
+    "args": {
+     "enderecoid": "ACACLD0001"
+    },
+    "ferramenta": "localizar_endereco",
+    "status": "encontrado"
+   },
+   {
+    "args": {
+     "enderecoid": "ACACLD0001",
+     "execution_id": "<LOTE>-00001"
+    },
+    "ferramenta": "salvar_resultado_bpr",
+    "status": "registrado"
+   }
+  ],
+  "duracao_s": 0,
+  "enderecoid": "ACACLD0001",
+  "erro": null,
+  "escopo": [
+   "E1A1",
+   "E1A2",
+   "E2A1",
+   "E2A2",
+   "E3A1",
+   "E3A2",
+   "E3A3",
+   "E3A4",
+   "E4A1",
+   "E4A2",
+   "E5A1",
+   "E5A2",
+   "E5A3",
+   "E6A1",
+   "E6A2",
+   "E6A3"
+  ],
+  "execution_id": "<LOTE>-00001",
+  "fim": "<HORA>",
+  "inicio": "<HORA>",
+  "lote_id": "<LOTE>",
+  "origem_envelope": "resposta_final",
+  "problemas": [],
+  "regravacoes": 0,
+  "tentativas": 1,
+  "tokens": {
+   "chamadas_modelo": 4,
+   "entrada": 360000,
+   "entrada_em_cache": 0,
+   "raciocinio": 8000,
+   "saida": 3200
+  }
+ },
+ "resumo": {
+  "avisos": [
+   "Extração de TSSR desligada: a Ação 5.3 usará o TSSR já extraído, mesmo que exista um mais recente pendente."
+  ],
+  "com_problema_de_contrato": 0,
+  "escopo": {
+   "avisos": [
+    "Extração de TSSR desligada: a Ação 5.3 usará o TSSR já extraído, mesmo que exista um mais recente pendente."
+   ],
+   "codigos": [
+    "ETAPA_01_ACAO_01_CONSISTENCIA_DETENTOR",
+    "ETAPA_01_ACAO_02_CONSISTENCIA_ADICIONAIS",
+    "ETAPA_02_ACAO_01_VIGENCIA_CONTRATUAL",
+    "ETAPA_02_ACAO_02_ADICIONAIS_REDUTIVEIS",
+    "ETAPA_03_ACAO_01_SITUACAO_FINANCEIRA",
+    "ETAPA_03_ACAO_02_SITUACAO_OPERACIONAL",
+    "ETAPA_03_ACAO_03_FOCO_DA_ANALISE",
+    "ETAPA_03_ACAO_04_CASOS_PARA_DISTRATO",
+    "ETAPA_04_ACAO_01_AVALIACAO_ULTIMA_SCI",
+    "ETAPA_04_ACAO_02_FRANQUIA_E_OCUPACAO",
+    "ETAPA_05_ACAO_01_CONSULTAR_TSSRS_DISPONIVEIS",
+    "ETAPA_05_ACAO_02_COMPARAR_TSSRS_DISPONIVEIS_E_EXTRAIDOS",
+    "ETAPA_05_ACAO_03_CONSULTAR_EQUIPAMENTOS_TSSR",
+    "ETAPA_06_ACAO_01_VERIFICAR_LIMITE_RF_POR_TECNOLOGIA",
+    "ETAPA_06_ACAO_02_CONSULTAR_E_CLASSIFICAR_ENLACES_TX",
+    "ETAPA_06_ACAO_03_CRUZAR_TX_TSSR_COM_ENLACES"
+   ],
+   "executar": [
+    "E1A1",
+    "E1A2",
+    "E2A1",
+    "E2A2",
+    "E3A1",
+    "E3A2",
+    "E3A3",
+    "E3A4",
+    "E4A1",
+    "E4A2",
+    "E5A1",
+    "E5A2",
+    "E5A3",
+    "E6A1",
+    "E6A2",
+    "E6A3"
+   ],
+   "permitir_extracao": false,
+   "solicitadas": [
+    "E1A1",
+    "E1A2",
+    "E2A1",
+    "E2A2",
+    "E3A1",
+    "E3A2",
+    "E3A3",
+    "E3A4",
+    "E4A1",
+    "E4A2",
+    "E5A1",
+    "E5A2",
+    "E5A3",
+    "E6A1",
+    "E6A2",
+    "E6A3"
+   ]
+  },
+  "executados": 2,
+  "localizacao": {
+   "ENCONTRADO": 1,
+   "NAO_ENCONTRADO": 1
+  },
+  "lote_id": "<LOTE>",
+  "persistencia": {
+   "registrado": 2
+  },
+  "pulados_ja_gravados": 0,
+  "recomendacoes_mais_frequentes": [
+   [
+    "Avaliar redução de AEV.",
+    1
+   ]
+  ],
+  "repetidos_ignorados": 1,
+  "tokens": {
+   "chamadas_modelo": 8,
+   "entrada": 720000,
+   "entrada_em_cache": 0,
+   "raciocinio": 16000,
+   "saida": 6400
+  },
+  "total_recebido": 3
+ }
+}
