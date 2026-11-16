@@ -142,7 +142,40 @@ def _inteiro(variavel: str, padrao: int) -> int:
 # Teto de tokens de raciocínio por chamada ao modelo. É o que mais pesa no
 # tempo de cada chamada; reduzir acelera, mas pode piorar as conclusões.
 # Mudar só depois de comparar o mesmo lote antes e depois.
-THINKING_BUDGET = _inteiro("BPR_THINKING_BUDGET", 16384)
+THINKING_BUDGET_PADRAO = 16384
+
+# Faixa que o Vertex AI aceita para thinking_budget, por família de modelo
+# (a mais específica primeiro). Fora dela, TODA chamada volta 400
+# INVALID_ARGUMENT ("thinking_budget is out of range") e o lote inteiro
+# falha sem analisar nada. A do flash é a que o Vertex devolveu na recusa
+# (1 a 24576: zero não desliga o raciocínio nele).
+FAIXAS_THINKING_BUDGET = (
+    ("gemini-2.5-flash-lite", 512, 24576),
+    ("gemini-2.5-flash", 1, 24576),
+    ("gemini-2.5-pro", 128, 32768),
+)
+
+
+def orcamento_de_raciocinio(modelo: str, valor: int) -> tuple[int | None, str | None]:
+    """(orçamento a mandar, aviso). None = raciocínio dinâmico: o parâmetro
+    não vai no pedido e o modelo decide. Valor fora da faixa do modelo vai
+    para o limite mais próximo, com aviso, em vez de derrubar o lote."""
+    if valor < 0:
+        return None, None
+    for prefixo, minimo, maximo in FAIXAS_THINKING_BUDGET:
+        if modelo.removeprefix("models/").startswith(prefixo):
+            if minimo <= valor <= maximo:
+                return valor, None
+            ajustado = min(max(valor, minimo), maximo)
+            return ajustado, (
+                f"BPR_THINKING_BUDGET = {valor} está fora da faixa que o {modelo} aceita "
+                f"({minimo} a {maximo}); usando {ajustado}. Corrija no .env, ou deixe vazio "
+                f"para o padrão ({THINKING_BUDGET_PADRAO}), ou -1 para raciocínio dinâmico.")
+    return valor, None
+
+
+THINKING_BUDGET, THINKING_BUDGET_AVISO = orcamento_de_raciocinio(
+    MODEL_NAME, _inteiro("BPR_THINKING_BUDGET", THINKING_BUDGET_PADRAO))
 
 # Cache explícito da instrução no Vertex, compartilhado por todos os
 # endereços do processo (agente_bpr/modelo.py). Desligado por padrão até

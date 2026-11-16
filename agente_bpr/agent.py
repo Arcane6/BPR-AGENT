@@ -8,7 +8,7 @@ from google.adk.planners import BuiltInPlanner
 from seguranca_bpr.injecao import REGRAS_DE_SEGURANCA
 
 from . import config
-from .config import MODEL_NAME, THINKING_BUDGET
+from .config import MODEL_NAME, THINKING_BUDGET, THINKING_BUDGET_AVISO
 from .guardas import (
     antes_da_ferramenta,
     depois_da_ferramenta,
@@ -32,6 +32,11 @@ from .tools import (
 # Lido na hora (e não no import), para o teste ligar e desligar.
 cache_da_instrucao = CacheDaInstrucao(lambda: config.CACHE_INSTRUCAO,
                                       config.CACHE_INSTRUCAO_TTL_S)
+
+if THINKING_BUDGET_AVISO:
+    import logging
+
+    logging.getLogger(__name__).warning(THINKING_BUDGET_AVISO)
 
 root_agent = Agent(
     name="agente_bpr",

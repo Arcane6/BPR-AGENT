@@ -43,6 +43,12 @@ def verificar_ambiente(permitir_extracao: bool = False) -> tuple[list[str], list
         elif not Path(caminho).exists():
             impedimentos.append(f"{nome} não encontrado: {caminho}")
 
+    # Orçamento de raciocínio fora da faixa do modelo: o agente já usa o
+    # limite mais próximo, mas quem configurou precisa saber.
+    aviso_raciocinio = getattr(cfg, "THINKING_BUDGET_AVISO", None)
+    if aviso_raciocinio:
+        avisos.append(aviso_raciocinio)
+
     resultado = getattr(cfg, "RESULT_PATH", None)
     if resultado is not None:
         pasta = Path(resultado).parent

@@ -51,7 +51,10 @@ CAMPOS_TOKENS = ("entrada", "entrada_em_cache", "saida", "raciocinio")
 
 # Nome de tabela não vai em bind: só passa se for esquema.tabela simples.
 _TABELA = re.compile(r"^[A-Za-z][A-Za-z0-9_$#]*(\.[A-Za-z][A-Za-z0-9_$#]*)?$")
-_CLASSE = re.compile(r"^([A-Za-z_][A-Za-z0-9_.]*)\s*:")
+# A classe da exceção: no começo ("ValueError: ...") ou depois de um
+# prefixo do orquestrador ("Pedido recusado ...: ClientError: 400 ...").
+_CLASSE = re.compile(r"(?:^|:\s)([A-Za-z_][A-Za-z0-9_.]*(?:Error|Exception))\s*:"
+                     r"|^([A-Za-z_][A-Za-z0-9_.]*)\s*:")
 
 COLUNAS = ("agente", "modelo", "sessao", "turno", "usuario", "competencia", "dt_inicio",
            "duracao_ms", "tokens_entrada", "tokens_saida", "tokens_cache",
@@ -132,8 +135,8 @@ def classe_do_erro(erro: str | None) -> str | None:
     caminho, SQL e valor de dado."""
     if not erro:
         return None
-    achou = _CLASSE.match(erro)
-    return achou.group(1)[:120] if achou else "SemGravacao"
+    achou = _CLASSE.search(erro)
+    return (achou.group(1) or achou.group(2))[:120] if achou else "SemGravacao"
 
 
 def linha(*, agente: str, sessao: str, turno: int, tokens: dict[str, Any], status: str,
