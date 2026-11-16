@@ -181,7 +181,9 @@ disfarces) e `test_n4_invisiveis_saem_antes_do_modelo`.
 | Intervalo entre mensagens | 1,5 s (`BPR_CADENCIA_MENSAGEM_S`) | idem |
 | Duração do turno | 4 h (`BPR_TEMPO_MAXIMO_TURNO_S`) | `servidor_bpr/conversa.py` |
 | Conversas na memória | 50, ociosa expira em 1 h | idem |
-| Teto de tokens do mês | `BPR_TETO_TOKENS_MES` (0 = sem teto); barra lote e mensagem | `seguranca_bpr/consumo.py` |
+| Teto de tokens do mês | `BPR_TETO_TOKENS_MES` (0 = sem teto), somado na tabela de consumo; barra lote e mensagem | `orquestrador_bpr/consumo.py` |
+| Lotes ao mesmo tempo | 4 por processo (`ORQ_MAX_LOTES_SIMULTANEOS`) | `orquestrador_bpr/lote.py` |
+| Endereços em análise ao mesmo tempo | 8 no processo, todos os lotes somados (`ORQ_MAX_ENDERECOS_SIMULTANEOS`) | idem |
 | Endereços por lote | 5.000 pela tela, 20 por chamada do chat | já existia |
 | Concorrência do lote | até 8, e 1 com extração | já existia |
 | Tempo por endereço | 30 min, com novas tentativas limitadas | já existia |
@@ -230,11 +232,16 @@ Sair da lista de exceções do `ci.yml` quando o google-adk aceitar a 1.45.2.
 
 ## Medições
 
-`GET /api/consumo` e a página **Consumo** da tela: tokens do mês e por dia,
-de lotes e de conversa (entrada, quanto dela veio do cache, saída,
-raciocínio), endereços, turnos, chamadas ao modelo, bloqueios e recusas, o
-teto do mês e as proteções em vigor. Os números vêm do `usage_metadata`
-que o Vertex AI devolve (o mesmo que ele fatura), nunca de estimativa.
+Uma linha por endereço analisado (`AGENTE = 'bpr'`) e por turno de
+conversa (`'bpr_orquestrador'`, inclusive o recusado, como NEGADO) em
+`NTW_OP.TB_PORTAL_CONSUMO_AGENTE`, a tabela do painel de consumo do portal,
+com as mesmas colunas e regras: tokens de entrada, cache (contido na
+entrada), saída, raciocínio e total, chamadas ao modelo, ferramentas,
+duração, usuário e status. Sem pergunta, resposta nem dado de negócio; do
+erro, só a classe. Os números vêm do `usage_metadata` que o Vertex AI
+devolve (o mesmo que ele fatura), nunca de estimativa. Banco fora do ar
+não perde linha: ela espera na fila local e sobe depois
+(`orquestrador_bpr/consumo.py`, testes em `tests/test_consumo.py`).
 
 ## Itens sem ação no código
 

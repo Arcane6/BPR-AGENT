@@ -3,6 +3,8 @@
 
 Um lugar só para o que o agente, o orquestrador e a API local usam em
 comum: log, trilha de auditoria selada, filtro de injeção de prompt,
-limites de uso, cabeçalhos da tela, saída para planilha e medição de
-consumo. O mapa de cada item para o código está em docs/SEGURANCA.md.
+limites de uso, cabeçalhos da tela, saída para planilha e as travas entre
+processos que deixam vários lotes rodarem juntos. O consumo de tokens vai
+para a tabela do portal (orquestrador_bpr/consumo.py). O mapa de cada
+item para o código está em docs/SEGURANCA.md.
 """

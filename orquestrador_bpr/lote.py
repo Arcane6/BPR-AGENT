@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 """Execução de lotes de endereços.
 
-Regras de concorrência:
-- salvar_resultado_bpr regrava o Excel inteiro e só tem trava dentro do
-  processo; a extração de TSSR usa pasta, log e BigQuery compartilhados.
-- Por isso o padrão é 1 endereço por vez. Paralelismo só é aceito com a
-  extração desligada, e a gravação no Excel continua serializada pela
-  trava do próprio tools.py (mesmo processo).
-- E um lote por vez no processo: a linha de comando, o chat e a API local
-  (servidor_bpr) chamam todos executar_lote, e dois lotes juntos dividiriam
-  o Excel e a pasta de Input. O segundo recebe LoteEmAndamento.
+Regras de concorrência (vários lotes em paralelo):
+- Vários lotes rodam juntos: na mesma tela, pelo chat, e em processos
+  diferentes (tela, linha de comando, adk web). O teto por processo é
+  ORQ_MAX_LOTES_SIMULTANEOS; passou, o lote novo recebe LoteEmAndamento.
+- Os endereços em análise no processo, somando todos os lotes, não passam
+  de ORQ_MAX_ENDERECOS_SIMULTANEOS (a cota do Vertex AI é uma só). A
+  concorrência de cada lote vale dentro desse teto.
+- O que era compartilhado ganhou trava de arquivo, que vale entre
+  processos (seguranca_bpr/travas.py): a gravação no Excel de resultados
+  (salvar_resultado_bpr), a extração de TSSR (uma por vez na máquina) e o
+  próprio endereço. O mesmo ENDEREÇOID em dois lotes ao mesmo tempo não
+  roda duas vezes: o segundo lote o deixa de lado, com aviso.
+- Lote com extração continua com 1 endereço por vez dentro dele: a
+  instrução extrai e depois consulta o que extraiu, na mesma execução.
 
 Saídas por lote, em ORQ_SAIDA_DIR/<lote_id>/:
 - resultados.jsonl: uma linha por endereço, gravada assim que termina
@@ -19,9 +24,10 @@ Saídas por lote, em ORQ_SAIDA_DIR/<lote_id>/:
 
 Toda origem (tela, conversa, linha de comando) passa por executar_lote, e é
 aqui que a trilha de auditoria registra o começo e o fim do lote e cada
-endereço analisado (seguranca_bpr.auditoria), que o teto de tokens do mês
-é conferido e que o identificador é validado antes de virar texto da
-mensagem ao Agente BPR.
+endereço analisado (seguranca_bpr.auditoria), que o consumo de cada
+endereço vai para a tabela do painel do portal (consumo.py), que o teto de
+tokens do mês é conferido e que o identificador é validado antes de virar
+texto da mensagem ao Agente BPR.
 """
 
 from __future__ import annotations
@@ -32,6 +38,7 @@ import json
 import re
 import threading
 import uuid
+import weakref
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -39,11 +46,12 @@ from pathlib import Path
 from typing import IO, Any, Callable, Iterable
 from zoneinfo import ZoneInfo
 
-from seguranca_bpr import auditoria, consumo
+from seguranca_bpr import auditoria
 from seguranca_bpr.limites import UsoNegado
 from seguranca_bpr.planilha import celula_csv
+from seguranca_bpr.travas import nome_seguro, trava
 
-from . import config
+from . import config, consumo
 from .catalogo_acoes import Escopo, resolver_escopo
 from .contrato import resumo_status_acoes
 from .executor import (
@@ -58,7 +66,22 @@ from .executor import (
 
 FUSO = ZoneInfo("America/Sao_Paulo")
 
-_lote_em_andamento = threading.Lock()
+# Lotes rodando neste processo, e os endereços em análise neles. A trava
+# de thread protege os dois conjuntos; entre processos, valem as travas de
+# arquivo do endereço.
+_trava_lotes = threading.Lock()
+_lotes_ativos: set[str] = set()
+_enderecos_em_analise: set[str] = set()
+# Uma vaga por endereço em análise no processo, por event loop.
+_vagas: "weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, asyncio.Semaphore]" = \
+    weakref.WeakKeyDictionary()
+
+
+def _vaga_global() -> asyncio.Semaphore:
+    loop = asyncio.get_running_loop()
+    if loop not in _vagas:
+        _vagas[loop] = asyncio.Semaphore(max(1, config.ORQ_MAX_ENDERECOS_SIMULTANEOS))
+    return _vagas[loop]
 
 # O ENDEREÇOID vai para dentro da mensagem ao Agente BPR. Restringir aos
 # caracteres de um código (letras, números e _ - . /) impede que um "id"
@@ -75,7 +98,7 @@ def separar_invalidos(enderecos: Iterable[str]) -> tuple[list[str], list[str]]:
 
 
 class LoteEmAndamento(RuntimeError):
-    """Já há um lote rodando neste processo."""
+    """O processo já está no teto de lotes simultâneos."""
 
 
 def normalizar_enderecos(valores: Iterable[str]) -> tuple[list[str], list[str]]:
@@ -142,6 +165,9 @@ class ResumoLote:
     avisos: list[str] = field(default_factory=list)
     # Ficaram na fila porque deve_parar pediu para parar.
     nao_executados: list[str] = field(default_factory=list)
+    # Deixados de lado porque outro lote (deste ou de outro processo)
+    # estava analisando o mesmo endereço naquela hora.
+    em_outro_lote: list[str] = field(default_factory=list)
 
     def contagens(self) -> dict[str, Any]:
         loc = Counter(r.campos.get("LOCALIZACAO_STATUS") or "SEM_RESULTADO"
@@ -171,6 +197,8 @@ class ResumoLote:
         }
         if self.nao_executados:
             contagens["nao_executados"] = self.nao_executados
+        if self.em_outro_lote:
+            contagens["em_outro_lote"] = self.em_outro_lote
         return contagens
 
 
@@ -183,6 +211,16 @@ class _GravadorJsonl:
         async with self._trava:
             with self.caminho.open("a", encoding="utf-8") as arquivo:
                 arquivo.write(json.dumps(registro, ensure_ascii=False, default=str) + "\n")
+
+
+def _nome_do_modelo() -> str | None:
+    """O modelo do Agente BPR, para a coluna MODELO da tabela de consumo."""
+    try:
+        import importlib
+
+        return getattr(importlib.import_module(config.BPR_CONFIG_MODULE), "MODEL_NAME", None)
+    except Exception:
+        return None
 
 
 def novo_lote_id() -> str:
@@ -218,25 +256,56 @@ async def executar_lote(
     quando ele termina. origem (tela, conversa, linha_de_comando) vai para a
     trilha de auditoria.
     """
-    teto = consumo.teto_atingido(saida_dir or config.ORQ_SAIDA_DIR)
+    # O teto lê a tabela no Oracle: só vai ao banco se houver teto.
+    teto = await asyncio.to_thread(consumo.teto_atingido) if consumo.teto_ligado() else None
     if teto:
         auditoria.registrar("uso_negado", motivo="teto_de_tokens", origem=origem)
         raise UsoNegado(teto)
-    if not _lote_em_andamento.acquire(blocking=False):
-        raise LoteEmAndamento(
-            "Já existe um lote em execução. Espere ele terminar: dois lotes juntos "
-            "dividiriam o Excel de resultados e a pasta de Input dos TSSRs.")
+    lote_id = lote_id or novo_lote_id()
+    with _trava_lotes:
+        if len(_lotes_ativos) >= config.ORQ_MAX_LOTES_SIMULTANEOS:
+            raise LoteEmAndamento(
+                f"Já há {len(_lotes_ativos)} lote(s) em execução, o máximo deste processo "
+                f"(ORQ_MAX_LOTES_SIMULTANEOS). Espere um terminar.")
+        _lotes_ativos.add(lote_id)
     try:
         return await _executar_lote(
             enderecos, acoes, parametros_negocio, permitir_extracao, concorrencia,
             pular_gravados_em, saida_dir, fabrica, campos_schema, salvar, ao_concluir,
             lote_id, ao_comecar, deve_parar, ao_progresso, origem, opcoes_executor)
     finally:
-        _lote_em_andamento.release()
+        with _trava_lotes:
+            _lotes_ativos.discard(lote_id)
 
 
 def lote_em_andamento() -> bool:
-    return _lote_em_andamento.locked()
+    return bool(_lotes_ativos)
+
+
+def lotes_em_andamento() -> list[str]:
+    """Os lote_id rodando neste processo, de qualquer origem."""
+    with _trava_lotes:
+        return sorted(_lotes_ativos)
+
+
+def _reservar_endereco(enderecoid: str):
+    """A trava do endereço, ou None se outro lote (deste ou de outro
+    processo) já o está analisando."""
+    chave = enderecoid.casefold()
+    with _trava_lotes:
+        if chave in _enderecos_em_analise:
+            return None
+        reserva = trava(f"endereco-{nome_seguro(chave)}", espera_s=0)
+        if not reserva.adquirir():
+            return None
+        _enderecos_em_analise.add(chave)
+        return reserva
+
+
+def _soltar_endereco(enderecoid: str, reserva) -> None:
+    with _trava_lotes:
+        _enderecos_em_analise.discard(enderecoid.casefold())
+        reserva.liberar()
 
 
 async def _executar_lote(
@@ -257,12 +326,12 @@ async def _executar_lote(
         avisos.append(f"{len(invalidos)} identificador(es) ignorado(s) por ter caracteres fora "
                       f"de letras, números e _ - . / (ex.: {exemplos}).")
     if concorrencia > 1 and permitir_extracao:
-        avisos.append("Concorrência reduzida para 1: a extração de TSSR não pode rodar "
-                      "em paralelo.")
+        avisos.append("Concorrência reduzida para 1: dentro de um lote com extração, a "
+                      "análise extrai e depois consulta o que extraiu, um endereço por vez.")
         concorrencia = 1
     concorrencia = max(1, concorrencia)
+    modelo = _nome_do_modelo()
 
-    lote_id = lote_id or novo_lote_id()
     pasta = (saida_dir or config.ORQ_SAIDA_DIR) / lote_id
     pasta.mkdir(parents=True, exist_ok=True)
     gravador = _GravadorJsonl(pasta / "resultados.jsonl")
@@ -291,53 +360,76 @@ async def _executar_lote(
                         concorrencia=concorrencia)
 
     async def processar(indice: int, enderecoid: str) -> None:
-        nonlocal concluidos
-        async with semaforo:
+        async with semaforo, _vaga_global():
             if deve_parar and deve_parar():
                 resumo.nao_executados.append(enderecoid)
                 return
-            inicio = datetime.now(FUSO).isoformat(timespec="seconds")
-            ao_evento = None
-            if ao_progresso:
-                def ao_evento(andamento, enderecoid=enderecoid):
-                    ao_progresso(enderecoid, andamento)
+            reserva = _reservar_endereco(enderecoid)
+            if reserva is None:
+                resumo.em_outro_lote.append(enderecoid)
+                return
             try:
-                resultado = await executar_endereco(
-                    enderecoid, escopo, fabrica,
-                    parametros_negocio=parametros_negocio,
-                    execution_id=f"{lote_id}-{indice:05d}",
-                    campos_schema=campos_schema,
-                    salvar=salvar,
-                    ao_evento=ao_evento,
-                    **opcoes_executor,
-                )
+                await analisar(indice, enderecoid)
             finally:
-                if ao_progresso:
-                    ao_progresso(enderecoid, None)
-            registro = {"lote_id": lote_id, "inicio": inicio,
-                        "fim": datetime.now(FUSO).isoformat(timespec="seconds"),
-                        "escopo": escopo.executar, **resultado.como_dict()}
-            await gravador.gravar(registro)
-            auditoria.registrar(
-                "endereco_analisado", lote_id=lote_id, execution_id=resultado.execution_id,
-                enderecoid=enderecoid, persistencia=resultado.persistencia_status,
-                ferramentas=[c.get("ferramenta") for c in resultado.chamadas],
-                tokens=consumo.total(resultado.tokens or {}), erro=bool(resultado.erro),
-                duracao_s=round(resultado.duracao_s, 1))
-            resumo.resultados.append(resultado)
-            concluidos += 1
-            if ao_concluir:
-                ao_concluir(resultado, concluidos, len(fila))
+                _soltar_endereco(enderecoid, reserva)
 
+    async def analisar(indice: int, enderecoid: str) -> None:
+        nonlocal concluidos
+        comeco = datetime.now(FUSO)
+        inicio = comeco.isoformat(timespec="seconds")
+        ao_evento = None
+        if ao_progresso:
+            def ao_evento(andamento, enderecoid=enderecoid):
+                ao_progresso(enderecoid, andamento)
+        try:
+            resultado = await executar_endereco(
+                enderecoid, escopo, fabrica,
+                parametros_negocio=parametros_negocio,
+                execution_id=f"{lote_id}-{indice:05d}",
+                campos_schema=campos_schema,
+                salvar=salvar,
+                ao_evento=ao_evento,
+                **opcoes_executor,
+            )
+        finally:
+            if ao_progresso:
+                ao_progresso(enderecoid, None)
+        registro = {"lote_id": lote_id, "inicio": inicio,
+                    "fim": datetime.now(FUSO).isoformat(timespec="seconds"),
+                    "escopo": escopo.executar, **resultado.como_dict()}
+        await gravador.gravar(registro)
+        auditoria.registrar(
+            "endereco_analisado", lote_id=lote_id, execution_id=resultado.execution_id,
+            enderecoid=enderecoid, persistencia=resultado.persistencia_status,
+            ferramentas=[c.get("ferramenta") for c in resultado.chamadas],
+            tokens=consumo.total(resultado.tokens or {}), erro=bool(resultado.erro),
+            duracao_s=round(resultado.duracao_s, 1))
+        # Uma linha por endereço na tabela de consumo do portal. Em segundo
+        # plano: com o banco lento ou fora, a vaga do endereço não fica
+        # presa esperando; o fim do lote espera todas.
+        gravacoes_consumo.append(asyncio.create_task(asyncio.to_thread(
+            consumo.registrar, consumo.linha_do_endereco(
+                lote_id, indice, resultado, comeco, modelo))))
+        resumo.resultados.append(resultado)
+        concluidos += 1
+        if ao_concluir:
+            ao_concluir(resultado, concluidos, len(fila))
+
+    gravacoes_consumo: list[asyncio.Task] = []
     situacao = "falhou"
     try:
         await asyncio.gather(*(processar(i, e) for i, e in enumerate(fila, start=1)))
         situacao = "parado" if resumo.nao_executados else "concluido"
     finally:
+        await asyncio.gather(*gravacoes_consumo, return_exceptions=True)
         auditoria.registrar("lote_encerrado", lote_id=lote_id, origem=origem,
                             situacao=situacao, executados=len(resumo.resultados),
                             nao_executados=len(resumo.nao_executados))
 
+    if resumo.em_outro_lote:
+        resumo.avisos.append(
+            f"{len(resumo.em_outro_lote)} endereço(s) deixado(s) de lado porque outro lote "
+            f"estava analisando o mesmo endereço: {', '.join(resumo.em_outro_lote[:10])}.")
     ordem = {e: i for i, e in enumerate(fila)}
     resumo.resultados.sort(key=lambda r: ordem.get(r.enderecoid, 0))
     resumo.nao_executados.sort(key=lambda e: ordem.get(e, 0))

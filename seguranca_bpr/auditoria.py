@@ -54,6 +54,7 @@ from zoneinfo import ZoneInfo
 
 from . import config, selo
 from .logs import request_id
+from .travas import trava
 
 log = logging.getLogger(__name__)
 
@@ -156,8 +157,18 @@ class Trilha:
             linha["selo"] = selo.selar(linha, self._ultimo_selo, self.chave)
             try:
                 self.pasta.mkdir(parents=True, exist_ok=True)
-                with self._arquivo(quando).open("a", encoding="utf-8") as arquivo:
-                    arquivo.write(json.dumps(linha, ensure_ascii=False, default=str) + "\n")
+                # Vários processos acrescentam no mesmo arquivo do dia (cada
+                # um na sua cadeia). A trava garante linha inteira, sem uma
+                # cortar a outra; se demorar, grava assim mesmo, porque
+                # linha perdida é pior que o risco de uma linha intercalada,
+                # que a conferência aponta como ilegível.
+                ocupada = trava("trilha-auditoria", espera_s=5)
+                ocupada.adquirir()
+                try:
+                    with self._arquivo(quando).open("a", encoding="utf-8") as arquivo:
+                        arquivo.write(json.dumps(linha, ensure_ascii=False, default=str) + "\n")
+                finally:
+                    ocupada.liberar()
             except OSError:
                 # Linha perdida não consome elo: a cadeia segue sem buraco, e
                 # o log explica a falta.

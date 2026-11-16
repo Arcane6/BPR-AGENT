@@ -18,15 +18,18 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
+from seguranca_bpr import config as seguranca
 from seguranca_bpr.planilha import proteger_linha
+from seguranca_bpr.travas import trava_do_arquivo
 
 from .. import config
 from .comum import celula_a_partir_de, normalizar_id
 
-# Serializa gravações concorrentes somente dentro deste processo Python.
-# Não protege o arquivo contra gravações simultâneas realizadas por
-# processos, workers, agentes ou máquinas diferentes.
-# A persistência no Excel deve ser executada sequencialmente.
+# Serializa as gravações dentro do processo. Entre processos da mesma
+# máquina (tela, linha de comando, adk web, vários lotes) vale a trava de
+# arquivo em salvar_resultado_bpr (seguranca_bpr/travas.py). Máquinas
+# diferentes gravando o mesmo Excel no OneDrive continuam sem proteção: a
+# sincronização é que decide, e cada máquina deve ter o seu resultado.
 _WRITE_LOCK = threading.RLock()
 
 STATUS_EXECUCAO_VALIDOS = {"CONCLUIDA", "ERRO"}
@@ -416,7 +419,12 @@ def salvar_resultado_bpr(
     caminho = config.RESULT_PATH
     caminho.parent.mkdir(parents=True, exist_ok=True)
 
+    trava = trava_do_arquivo(caminho, seguranca.ESPERA_TRAVA_EXCEL_S)
     with _WRITE_LOCK:
+        if not trava.adquirir():
+            return {"status": "erro", "motivo": (
+                "O Excel de resultados está sendo gravado por outro lote ou processo há "
+                f"mais de {seguranca.ESPERA_TRAVA_EXCEL_S} s. Tente novamente: {caminho}")}
         wb = None
         try:
             if caminho.exists():
@@ -467,3 +475,4 @@ def salvar_resultado_bpr(
         finally:
             if wb is not None:
                 wb.close()
+            trava.liberar()

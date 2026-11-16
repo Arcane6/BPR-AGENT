@@ -70,6 +70,21 @@ AUDITORIA_LIGADA = _texto("BPR_AUDITORIA_LIGADA", "1") not in {"0", "false", "na
 CHAVE_AUDITORIA = _texto("BPR_CHAVE_AUDITORIA") or None
 
 # ---------------------------------------------------------------------------
+# Travas entre processos (travas.py)
+# ---------------------------------------------------------------------------
+
+# Pasta dos arquivos de trava. Precisa ser a mesma para todos os processos
+# da máquina (tela, linha de comando, adk web) e local: numa pasta do
+# OneDrive a sincronização poderia segurar o arquivo.
+TRAVAS_DIR = Path(_texto("BPR_TRAVAS_DIR", str(RAIZ_PROJETO / ".travas"))).resolve()
+# Quanto uma gravação no Excel de resultados espera outra terminar. Passou,
+# a gravação devolve erro e o orquestrador tenta de novo (regravação).
+ESPERA_TRAVA_EXCEL_S = _int("BPR_ESPERA_TRAVA_EXCEL_S", 120)
+# Quanto uma extração de TSSR espera a de outro lote terminar. Cada uma leva
+# até BPR_TSSR_EXTRACTOR_TIMEOUT_SECONDS (600 s por padrão).
+ESPERA_TRAVA_EXTRACAO_S = _int("BPR_ESPERA_TRAVA_EXTRACAO_S", 1800)
+
+# ---------------------------------------------------------------------------
 # Injeção de prompt (injecao.py)
 # ---------------------------------------------------------------------------
 

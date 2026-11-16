@@ -7,9 +7,10 @@ import { falsificarApi } from "../testes/renderizar";
 import { renderizar } from "../testes/renderizar";
 import { NovoLote } from "./NovoLote";
 
-function api({ ambienteOk = true, loteRodando = false } = {}) {
+function api({ ambienteOk = true, lotesRodando = 0 } = {}) {
+  const lotes = Array.from({ length: lotesRodando }, (_, i) => `lote-${i}`);
   return falsificarApi({
-    "GET /api/saude": { corpo: { ...exemplos.saude, lote_em_andamento: loteRodando ? "x" : null } },
+    "GET /api/saude": { corpo: { ...exemplos.saude, lotes_em_andamento: lotes } },
     "GET /api/acoes": { corpo: { acoes: exemplos.acoes } },
     "POST /api/escopo": { corpo: exemplos.escopo },
     "GET /api/ambiente": {
@@ -46,7 +47,7 @@ describe("Novo lote", () => {
     expect(await screen.findByText(/Incluídas como dependência: 5.1, 5.2, 5.3, 6.2/)).toBeInTheDocument();
   });
 
-  it("não deixa começar com o ambiente impedido nem com outro lote rodando", async () => {
+  it("não deixa começar com o ambiente impedido nem com o teto de lotes atingido", async () => {
     api({ ambienteOk: false });
     const { unmount } = renderizar(<NovoLote />);
     await userEvent.type(screen.getByLabelText("Endereços"), "A1");
@@ -54,11 +55,19 @@ describe("Novo lote", () => {
     expect(screen.getByRole("button", { name: /Começar lote/ })).toBeDisabled();
     unmount();
 
-    api({ loteRodando: true });
+    api({ lotesRodando: exemplos.saude.max_lotes_simultaneos });
     renderizar(<NovoLote />);
     await userEvent.type(screen.getByLabelText("Endereços"), "A1");
-    expect(await screen.findByText("Já há um lote rodando")).toBeInTheDocument();
+    expect(await screen.findByText(/Já há 4 lotes rodando/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Começar lote/ })).toBeDisabled();
+  });
+
+  it("começa um lote junto com outro que já está rodando", async () => {
+    api({ lotesRodando: 1 });
+    renderizar(<NovoLote />);
+    await userEvent.type(screen.getByLabelText("Endereços"), "A1");
+    expect(await screen.findByText(/Há 1 lote rodando/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: /Começar lote/ })).toBeEnabled());
   });
 
   it("pede confirmação antes de autorizar a extração e então libera a 5.2B", async () => {

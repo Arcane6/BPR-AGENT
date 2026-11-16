@@ -17,6 +17,10 @@ numpy
 openpyxl==3.1.5
 python-dotenv==1.2.2
 
+# Consumo de tokens na tabela do painel do portal (orquestrador_bpr/consumo.py).
+# Mesma versão do coverage-hub. Modo thin: não precisa de Instant Client.
+oracledb==3.2.0
+
 # API local e tela (servidor_bpr). Já vinham com o google-adk; ficam
 # explícitos porque o servidor usa direto. Upload de arquivo: multipart.
 fastapi==0.141.1

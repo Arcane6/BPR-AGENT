@@ -49,6 +49,7 @@ def pytest_configure(config):
         "ORQ_ESPERA_GRAVACAO_S": "0",
         # A trilha dos testes não pode cair na pasta auditoria/ do projeto.
         "BPR_AUDITORIA_DIR": str(AUDITORIA),
+        "BPR_TRAVAS_DIR": str(AUDITORIA / "travas"),
     })
 
 
@@ -87,3 +88,20 @@ def dados():
     (DADOS / "TSSR" / "Input").mkdir(parents=True)
     yield DADOS
     shutil.rmtree(DADOS, ignore_errors=True)
+
+
+@pytest.fixture(autouse=True)
+def oracle(monkeypatch, tmp_path):
+    """A tabela de consumo do portal num Oracle falso (oracle_falso.py), com
+    a fila local numa pasta do teste: nenhum teste tenta o banco de verdade
+    nem herda linha pendente de outro."""
+    from oracle_falso import OracleFalso
+
+    from orquestrador_bpr import consumo
+    from seguranca_bpr import config as seguranca
+
+    banco = OracleFalso()
+    monkeypatch.setattr(consumo, "_conectar", banco.conectar)
+    monkeypatch.setattr(seguranca, "AUDITORIA_DIR", tmp_path / "auditoria-consumo")
+    monkeypatch.setitem(consumo._estado, "avisou", False)
+    return banco

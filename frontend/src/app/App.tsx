@@ -25,14 +25,12 @@ const Lotes = lazy(() => import("../paginas/Lotes").then((m) => ({ default: m.Lo
 const Lote = lazy(() => import("../paginas/Lote").then((m) => ({ default: m.Lote })));
 const Resultados = lazy(() => import("../paginas/Resultados").then((m) => ({ default: m.Resultados })));
 const Conversa = lazy(() => import("../paginas/Conversa").then((m) => ({ default: m.Conversa })));
-const Consumo = lazy(() => import("../paginas/Consumo").then((m) => ({ default: m.Consumo })));
 
 const MENU = [
   { para: "/", rotulo: "Novo lote", icone: "bi-plus-circle", exato: true },
   { para: "/lotes", rotulo: "Lotes", icone: "bi-collection" },
   { para: "/resultados", rotulo: "Resultados", icone: "bi-table" },
   { para: "/conversa", rotulo: "Conversa", icone: "bi-chat-dots" },
-  { para: "/consumo", rotulo: "Consumo", icone: "bi-speedometer2" },
 ];
 
 function Saude() {
@@ -41,16 +39,22 @@ function Saude() {
     return <Badge color="red" variant="light">API fora do ar</Badge>;
   }
   if (!saude.data) return null;
-  const { lote_em_andamento: lote, lote_fora_da_tela: fora } = saude.data;
+  const { lotes_em_andamento: lotes, lotes_fora_da_tela: fora } = saude.data;
   return (
     <Group gap="xs">
-      {lote && (
-        <Badge component={Link} to={`/lotes/${lote}`} color="tim" variant="filled"
-          style={{ cursor: "pointer" }} leftSection={<i className="bi bi-activity" />}>
-          Lote em andamento
+      {lotes.length > 0 && (
+        // Um lote leva direto a ele; vários, à lista.
+        <Badge component={Link} to={lotes.length === 1 ? `/lotes/${lotes[0]}` : "/lotes"}
+          color="tim" variant="filled" style={{ cursor: "pointer" }}
+          leftSection={<i className="bi bi-activity" />}>
+          {lotes.length === 1 ? "Lote em andamento" : `${lotes.length} lotes em andamento`}
         </Badge>
       )}
-      {fora && <Badge color="orange" variant="light">Lote em andamento pelo chat</Badge>}
+      {fora > 0 && (
+        <Badge color="orange" variant="light">
+          {fora === 1 ? "Lote em andamento pelo chat" : `${fora} lotes em andamento pelo chat`}
+        </Badge>
+      )}
       <Tooltip label={`Agente BPR: ${saude.data.modelo_agente} · Orquestrador: ${saude.data.modelo_orquestrador}`}>
         <Badge variant="outline" color="gray" visibleFrom="sm">{saude.data.modelo_agente}</Badge>
       </Tooltip>
@@ -114,7 +118,6 @@ export function App() {
           <Route path="/lotes/:loteId" element={<Lote />} />
           <Route path="/resultados" element={<Resultados />} />
           <Route path="/conversa" element={<Conversa />} />
-          <Route path="/consumo" element={<Consumo />} />
           <Route path="*" element={<Vazio titulo="Página não encontrada." />} />
         </Routes>
         </Suspense>

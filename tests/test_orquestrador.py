@@ -456,8 +456,11 @@ def test_limite_de_enderecos_conta_so_os_validos(ambiente_pronto, monkeypatch):
     assert chamado["enderecos"] == ["A1", "A2"]
 
 
-def test_um_lote_por_vez_no_processo(tmp_path, ambiente_pronto, monkeypatch):
-    """A segunda chamada recebe LoteEmAndamento; pelo chat, vira recusa."""
+def test_teto_de_lotes_no_processo(tmp_path, ambiente_pronto, monkeypatch):
+    """Passou de ORQ_MAX_LOTES_SIMULTANEOS, o lote novo recebe
+    LoteEmAndamento; pelo chat, vira recusa. (Lotes em paralelo dentro do
+    teto: test_paralelo.py.)"""
+    monkeypatch.setattr(lote.config, "ORQ_MAX_LOTES_SIMULTANEOS", 1)
     campos = campos_completos()
 
     async def dois_lotes():
@@ -482,7 +485,7 @@ def test_um_lote_por_vez_no_processo(tmp_path, ambiente_pronto, monkeypatch):
         return recusa
 
     recusa = asyncio.run(dois_lotes())
-    assert recusa["status"] == "recusado" and "lote em execução" in recusa["motivo"]
+    assert recusa["status"] == "recusado" and "em execução" in recusa["motivo"]
     assert not lote.lote_em_andamento()
 
 

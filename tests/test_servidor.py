@@ -21,6 +21,7 @@ from modelo_roteiro import ModeloRoteiro, chamadas, texto
 
 from agente_bpr import tools
 from orquestrador_bpr import agent as agente_orquestrador
+from orquestrador_bpr import config
 from servidor_bpr.app import criar_app
 
 SCHEMA = list(tools.CAMPOS_RESULTADO_NEGOCIO)
@@ -179,19 +180,26 @@ def test_lote_completo_detalhe_e_exportacao(tmp_path):
         assert cliente.get(f"/api/lotes/{lote_id}/exportar?formato=pdf").status_code == 400
 
 
-def test_um_lote_por_vez_e_parar(tmp_path):
+def test_varios_lotes_em_paralelo_teto_e_parar(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "ORQ_MAX_LOTES_SIMULTANEOS", 2)
     liberar = threading.Event()
     with _cliente(tmp_path, fabrica=_fabrica(liberar)) as cliente:
         lote_id = cliente.post("/api/lotes", json={
             "enderecos": ["A1", "A2", "A3"]}).json()["lote_id"]
         segundo = cliente.post("/api/lotes", json={"enderecos": ["B1"]})
-        assert segundo.status_code == 409
-        assert cliente.get("/api/saude").json()["lote_em_andamento"] == lote_id
+        assert segundo.status_code == 202
+        terceiro = cliente.post("/api/lotes", json={"enderecos": ["C1"]})
+        assert terceiro.status_code == 409 and "ORQ_MAX_LOTES_SIMULTANEOS" in \
+            terceiro.json()["detail"]
+        saude = cliente.get("/api/saude").json()
+        assert saude["lotes_em_andamento"] == sorted([lote_id, segundo.json()["lote_id"]])
+        assert saude["max_lotes_simultaneos"] == 2
 
         assert cliente.post(f"/api/lotes/{lote_id}/parar").json() == {"situacao": "parando"}
         assert cliente.get(f"/api/lotes/{lote_id}").json()["situacao"] == "parando"
         liberar.set()
         lote = _esperar(cliente, lote_id)
+        outro = _esperar(cliente, segundo.json()["lote_id"])
 
         # O endereço que já tinha começado terminou; os outros ficaram.
         assert lote["situacao"] == "parado"
@@ -199,6 +207,9 @@ def test_um_lote_por_vez_e_parar(tmp_path):
         assert lote["pendentes"] == ["A2", "A3"]
         assert lote["resumo"]["nao_executados"] == ["A2", "A3"]
         assert cliente.post(f"/api/lotes/{lote_id}/parar").status_code == 409
+        # O outro lote rodou junto, sem esperar o primeiro.
+        assert outro["situacao"] == "concluido"
+        assert [linha["enderecoid"] for linha in outro["linhas"]] == ["B1"]
 
 
 def test_resultados_pega_o_mais_recente_e_pula_gravados(tmp_path):

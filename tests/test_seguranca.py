@@ -24,7 +24,7 @@ from test_servidor import _cliente, _esperar
 from agente_bpr import agent as agente_bpr
 from orquestrador_bpr import agent as agente_orquestrador
 from orquestrador_bpr.lote import separar_invalidos
-from seguranca_bpr import adk, auditoria, cabecalhos, consumo, injecao, planilha, selo
+from seguranca_bpr import adk, auditoria, cabecalhos, injecao, planilha, selo
 from seguranca_bpr import config as seguranca
 from seguranca_bpr.limites import ControleDeUso, LimiteDeTaxa, RegistroSessoes, UsoNegado
 from seguranca_bpr.verificar_auditoria import conferir
@@ -386,27 +386,28 @@ def test_n5_mensagem_longa_e_recusada_no_servidor(tmp_path, monkeypatch):
     assert resposta.status_code == 422
 
 
-def test_n5_teto_de_tokens_do_mes(trilha, tmp_path, monkeypatch):
-    saida = tmp_path / "saida" / "20261101-000000-abcdef"
-    saida.mkdir(parents=True)
-    hoje = dt.datetime.now(auditoria.FUSO).isoformat()
-    (saida / "resultados.jsonl").write_text(json.dumps({
-        "fim": hoje, "tokens": {"entrada": 900, "saida": 50, "raciocinio": 50,
-                                "entrada_em_cache": 800, "chamadas_modelo": 2}}) + "\n")
+def test_n5_teto_de_tokens_do_mes(trilha, tmp_path, monkeypatch, oracle):
+    competencia = dt.datetime.now(auditoria.FUSO).strftime("%Y-%m")
+    oracle.linhas.append({"agente": "bpr", "competencia": competencia, "tokens_total": 1000})
+    # O consumo do portal não conta para o teto do BPR.
+    oracle.linhas.append({"agente": "planning", "competencia": competencia,
+                          "tokens_total": 10**9})
     monkeypatch.setattr(seguranca, "TETO_TOKENS_MES", 1000)
     with _cliente(tmp_path) as cliente:
         lote = cliente.post("/api/lotes", json={"enderecos": ["ACACLD0001"]})
         sessao = cliente.post("/api/conversas").json()["sessao_id"]
         mensagem = cliente.post(f"/api/conversas/{sessao}/mensagens", json={"texto": "oi"})
-        medido = cliente.get("/api/consumo").json()
     assert lote.status_code == 429 and "teto" in lote.json()["detail"]
     assert mensagem.status_code == 429
-    assert medido["tokens_do_mes"] == 1000 and medido["teto_atingido"]
-    # O cache é parte da entrada, não soma de novo.
-    assert medido["totais"]["lote_total"] == 1000
+    assert "uso_negado" in _eventos(trilha.pasta)
+
+    # Banco fora do ar: o teto não tem como ser conferido e não barra.
+    oracle.fora_do_ar = True
+    with _cliente(tmp_path) as cliente:
+        assert cliente.post("/api/lotes", json={"enderecos": ["ACACLD0001"]}).status_code == 202
 
 
-def test_n5_turno_preso_e_interrompido(tmp_path, trilha):
+def test_n5_turno_preso_e_interrompido(tmp_path, trilha, oracle):
     from servidor_bpr.conversa import Conversas
 
     class ModeloLento(ModeloRoteiro):
@@ -420,21 +421,21 @@ def test_n5_turno_preso_e_interrompido(tmp_path, trilha):
         sessao = await conversas.criar()
         conversas.enviar(sessao, "Analise o ACACLD0001")
         await sessao.tarefa
+        await conversas.encerrar()
         return sessao
 
     sessao = asyncio.run(rodar())
     assert sessao.mensagens[-1]["tipo"] == "erro"
     assert "interrompido" in sessao.mensagens[-1]["texto"]
-    [turno] = [json.loads(t) for t in trilha.pasta.glob("consumo-conversa-*.jsonl")
-               .__next__().read_text().splitlines()]
-    assert turno["desfecho"] == "tempo_esgotado" and "texto" not in turno
+    [turno] = oracle.linhas
+    assert turno["status"] == "TIMEOUT" and turno["erro"] == "TimeoutError"
 
 
 # ---------------------------------------------------------------------------
 # N7: informação sensível
 # ---------------------------------------------------------------------------
 
-def test_n7_mensagem_entra_na_trilha_pelo_tamanho_nunca_pelo_texto(trilha, tmp_path):
+def test_n7_mensagem_entra_pelo_tamanho_nunca_pelo_texto(trilha, tmp_path, oracle):
     agente = Agent(name="o", model=ModeloRoteiro(passos=[texto("ok")]), instruction="x")
     segredo = "Analise o ACACLD0001 com a senha 123456"
     with _cliente(tmp_path, agente=agente) as cliente:
@@ -444,43 +445,14 @@ def test_n7_mensagem_entra_na_trilha_pelo_tamanho_nunca_pelo_texto(trilha, tmp_p
             if not cliente.get(f"/api/conversas/{sessao}").json()["ocupada"]:
                 break
             time.sleep(0.05)
-        medido = cliente.get("/api/consumo").json()
     conteudo = "".join(p.read_text() for p in trilha.pasta.glob("*.jsonl"))
     assert "senha" not in conteudo and "ACACLD0001 com" not in conteudo
     [linha] = [x for x in _linhas(trilha.pasta) if x["evento"] == "mensagem_enviada"]
     assert linha["detalhe"]["caracteres"] == len(segredo)
-    assert medido["totais"]["turnos"] == 1
-    assert medido["protecoes"]["CHAVE_AUDITORIA"] == "definida"
-    assert "chave-de-teste" not in json.dumps(medido)
-
-
-def test_n7_consumo_por_dia_soma_lote_conversa_e_bloqueios(trilha, tmp_path):
-    medidor = consumo.Medidor()
-
-    class Uso:
-        prompt_token_count = 100
-        cached_content_token_count = 60
-        candidates_token_count = 10
-        thoughts_token_count = 5
-
-    class Evento:
-        partial = False
-        usage_metadata = Uso()
-
-        def get_function_calls(self):
-            return []
-
-    medidor.observar(Evento())
-    parcial = Evento()
-    parcial.partial = True
-    medidor.observar(parcial)
-    consumo.registrar_turno("s1", medidor, 1.0, "ok")
-    auditoria.registrar("prompt_bloqueado", categorias=["revelar_instrucoes"])
-    resumo = consumo.resumo(tmp_path / "sem-lotes")
-    assert resumo["totais"]["conversa_total"] == 115
-    assert resumo["totais"]["conversa_entrada_em_cache"] == 60
-    assert resumo["totais"]["prompt_bloqueado"] == 1
-    assert resumo["totais"]["turnos"] == 1
+    # Na tabela de consumo, o mesmo: o tamanho, nunca o texto.
+    [turno] = oracle.linhas
+    assert turno["caracteres_pergunta"] == len(segredo)
+    assert "senha" not in json.dumps(turno, default=str)
 
 
 def test_exportacao_xlsx_tambem_protege(tmp_path):

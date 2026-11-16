@@ -11,9 +11,12 @@ export type Saude = {
   modelo_agente: string;
   modelo_orquestrador: string;
   saida_dir: string;
-  lote_em_andamento: string | null;
-  /** Há lote rodando no processo que não foi começado pela tela (chat). */
-  lote_fora_da_tela: boolean;
+  /** Lotes começados pela tela e ainda rodando (vários podem rodar juntos). */
+  lotes_em_andamento: string[];
+  /** Lotes rodando no processo que não foram começados pela tela (chat). */
+  lotes_fora_da_tela: number;
+  /** Teto de lotes ao mesmo tempo no servidor (ORQ_MAX_LOTES_SIMULTANEOS). */
+  max_lotes_simultaneos: number;
 };
 
 export type Acao = {
@@ -185,24 +188,3 @@ export type Conversa = {
 };
 
 export type FormatoExportacao = "xlsx" | "csv" | "json";
-/** Contagens de um dia ou do mês em GET /api/consumo (seguranca_bpr/consumo.py).
- * O servidor só manda o que não é zero: campo ausente vale 0. */
-export type CampoConsumo =
-  | "enderecos" | "chamadas_lote" | "lote_entrada" | "lote_entrada_em_cache" | "lote_saida"
-  | "lote_raciocinio" | "lote_total" | "turnos" | "chamadas_conversa" | "conversa_entrada"
-  | "conversa_entrada_em_cache" | "conversa_saida" | "conversa_raciocinio" | "conversa_total"
-  | "prompt_bloqueado" | "prompt_suspeito" | "uso_negado" | "ferramenta_bloqueada";
-
-export type ContagemConsumo = Partial<Record<CampoConsumo, number>>;
-
-export type Consumo = {
-  mes: string;
-  por_dia: (ContagemConsumo & { dia: string })[];
-  totais: ContagemConsumo;
-  tokens_do_mes: number;
-  /** 0 = sem teto. */
-  teto_tokens_mes: number;
-  teto_atingido: boolean;
-  protecoes: Record<string, string | number | boolean>;
-  auditoria_linhas_perdidas: number;
-};
