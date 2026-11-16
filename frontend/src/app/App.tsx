@@ -25,12 +25,14 @@ const Lotes = lazy(() => import("../paginas/Lotes").then((m) => ({ default: m.Lo
 const Lote = lazy(() => import("../paginas/Lote").then((m) => ({ default: m.Lote })));
 const Resultados = lazy(() => import("../paginas/Resultados").then((m) => ({ default: m.Resultados })));
 const Conversa = lazy(() => import("../paginas/Conversa").then((m) => ({ default: m.Conversa })));
+const Consumo = lazy(() => import("../paginas/Consumo").then((m) => ({ default: m.Consumo })));
 
 const MENU = [
   { para: "/", rotulo: "Novo lote", icone: "bi-plus-circle", exato: true },
   { para: "/lotes", rotulo: "Lotes", icone: "bi-collection" },
   { para: "/resultados", rotulo: "Resultados", icone: "bi-table" },
   { para: "/conversa", rotulo: "Conversa", icone: "bi-chat-dots" },
+  { para: "/consumo", rotulo: "Consumo", icone: "bi-speedometer2" },
 ];
 
 function Saude() {
@@ -112,6 +114,7 @@ export function App() {
           <Route path="/lotes/:loteId" element={<Lote />} />
           <Route path="/resultados" element={<Resultados />} />
           <Route path="/conversa" element={<Conversa />} />
+          <Route path="/consumo" element={<Consumo />} />
           <Route path="*" element={<Vazio titulo="Página não encontrada." />} />
         </Routes>
         </Suspense>

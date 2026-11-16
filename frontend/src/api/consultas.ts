@@ -6,6 +6,7 @@ import { api } from "./cliente";
 import type {
   Acao,
   Ambiente,
+  Consumo,
   Conversa,
   DetalheEndereco,
   Escopo,
@@ -74,6 +75,14 @@ export function useDetalheEndereco(loteId: string | null, executionId: string | 
     queryFn: () =>
       api.get<DetalheEndereco>(`/api/lotes/${loteId}/enderecos/${executionId}`),
     enabled: Boolean(loteId && executionId),
+  });
+}
+
+export function useConsumo(mes: string | null) {
+  return useQuery({
+    queryKey: ["consumo", mes],
+    queryFn: () => api.get<Consumo>(mes ? `/api/consumo?mes=${mes}` : "/api/consumo"),
+    refetchInterval: 30000,
   });
 }
 
