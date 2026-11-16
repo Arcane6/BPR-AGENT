@@ -1,0 +1,44 @@
+# Atualização de dependências (item N6 do apontamento da segurança: cadeia
+# de suprimentos). O Dependabot abre PR quando sai versão nova, e a CI de
+# cada PR roda pip-audit, npm audit, testes e build antes de qualquer
+# merge. Alerta de vulnerabilidade sai na hora, fora do ciclo semanal
+# (Settings > Code security > Dependabot alerts e security updates).
+#
+# Agrupado e com teto de PRs: um PR por ecossistema por semana.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      python:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: "deps(python)"
+
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      front:
+        update-types: [minor, patch]
+    commit-message:
+      prefix: "deps(frontend)"
+
+  # As Actions ficam presas por SHA no ci.yml; é o Dependabot que as sobe.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: "deps(ci)"

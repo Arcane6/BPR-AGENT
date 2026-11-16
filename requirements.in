@@ -1,6 +1,6 @@
 # Dependências diretas do Agente BPR e do orquestrador. O lock é o
 # requirements.txt, gerado a partir daqui:
-#   uv pip compile requirements.in --universal --python-version 3.11 -o requirements.txt
+#   python -m uv pip compile requirements.in --universal --python-version 3.11 --generate-hashes -o requirements.txt
 # Dependência nova entra aqui, e o lock é gerado de novo.
 
 # Agentes (mesma versão do portal, coverage-hub/backend).
