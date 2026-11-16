@@ -1,0 +1,26 @@
+{
+ "encontrado": {
+  "documentos": [
+   {
+    "file_name": "TSSR OC 875367.XLSX"
+   },
+   {
+    "file_name": "TSSR ANTIGO.XLSX"
+   }
+  ],
+  "enderecoid": "ACACLD0001",
+  "quantidade_documentos": 2,
+  "status": "encontrado"
+ },
+ "nao_encontrado": {
+  "documentos": [],
+  "enderecoid": "ACACLD0009",
+  "quantidade_documentos": 0,
+  "status": "nao_encontrado"
+ },
+ "sql": "\n        SELECT DISTINCT\n            TRIM(CAST(FileName AS STRING)) AS FileName\n        FROM `projeto-teste.dataset_teste.VW_AEV_TSSR_Equipamentos_Comp`\n        WHERE UPPER(TRIM(CAST(EndID AS STRING)))\n            = UPPER(TRIM(@endereco_id))\n          AND FileName IS NOT NULL\n          AND TRIM(CAST(FileName AS STRING)) NOT IN ('', '-')\n        ORDER BY FileName\n    ",
+ "vazio": {
+  "motivo": "ENDERECO_ID não informado.",
+  "status": "erro"
+ }
+}

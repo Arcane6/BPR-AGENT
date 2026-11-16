@@ -1,0 +1,307 @@
+{
+ "acoes": [
+  {
+   "abrev": "E1A1",
+   "campos": {
+    "E1A1_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "1.1",
+   "status": "CONCLUIDA",
+   "titulo": "Consistência de detentor"
+  },
+  {
+   "abrev": "E1A2",
+   "campos": {
+    "E1A2_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "1.2",
+   "status": "CONCLUIDA",
+   "titulo": "Consistência de adicionais"
+  },
+  {
+   "abrev": "E2A1",
+   "campos": {
+    "E2A1_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "2.1",
+   "status": "CONCLUIDA",
+   "titulo": "Vigência contratual"
+  },
+  {
+   "abrev": "E2A2",
+   "campos": {
+    "E2A2_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "2.2",
+   "status": "CONCLUIDA",
+   "titulo": "Adicionais redutíveis"
+  },
+  {
+   "abrev": "E3A1",
+   "campos": {
+    "E3A1_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "3.1",
+   "status": "CONCLUIDA",
+   "titulo": "Situação financeira"
+  },
+  {
+   "abrev": "E3A2",
+   "campos": {
+    "E3A2_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "3.2",
+   "status": "CONCLUIDA",
+   "titulo": "Situação operacional"
+  },
+  {
+   "abrev": "E3A3",
+   "campos": {
+    "E3A3_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "3.3",
+   "status": "CONCLUIDA",
+   "titulo": "Foco da análise"
+  },
+  {
+   "abrev": "E3A4",
+   "campos": {
+    "E3A4_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "3.4",
+   "status": "CONCLUIDA",
+   "titulo": "Casos para distrato"
+  },
+  {
+   "abrev": "E4A1",
+   "campos": {
+    "E4A1_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "4.1",
+   "status": "CONCLUIDA",
+   "titulo": "Última SCI"
+  },
+  {
+   "abrev": "E4A2",
+   "campos": {
+    "E4A2_DIFERENCA_AEV": 1.5,
+    "E4A2_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "4.2",
+   "status": "CONCLUIDA",
+   "titulo": "Franquia e ocupação de AEV"
+  },
+  {
+   "abrev": "E5A1",
+   "campos": {
+    "E5A1_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "5.1",
+   "status": "CONCLUIDA",
+   "titulo": "TSSRs disponíveis"
+  },
+  {
+   "abrev": "E5A2",
+   "campos": {
+    "E5A2_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "5.2",
+   "status": "CONCLUIDA",
+   "titulo": "Comparar disponíveis e extraídos"
+  },
+  {
+   "abrev": "E5A2B",
+   "campos": {
+    "E5A2B_STATUS": "NAO_EXECUTADA"
+   },
+   "rotulo": "5.2B",
+   "status": "NAO_EXECUTADA",
+   "titulo": "Localizar e extrair TSSR pendente"
+  },
+  {
+   "abrev": "E5A3",
+   "campos": {
+    "E5A3_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "5.3",
+   "status": "CONCLUIDA",
+   "titulo": "Equipamentos do TSSR extraído"
+  },
+  {
+   "abrev": "E6A1",
+   "campos": {
+    "E6A1_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "6.1",
+   "status": "CONCLUIDA",
+   "titulo": "Limite de RF por tecnologia"
+  },
+  {
+   "abrev": "E6A2",
+   "campos": {
+    "E6A2_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "6.2",
+   "status": "CONCLUIDA",
+   "titulo": "Enlaces de transmissão"
+  },
+  {
+   "abrev": "E6A3",
+   "campos": {
+    "E6A3_STATUS": "CONCLUIDA"
+   },
+   "rotulo": "6.3",
+   "status": "CONCLUIDA",
+   "titulo": "Cruzamento TX x enlaces"
+  }
+ ],
+ "chamadas": [
+  {
+   "args": {},
+   "ferramenta": "obter_data_referencia",
+   "status": "concluido"
+  },
+  {
+   "args": {
+    "enderecoid": "ACACLD0001"
+   },
+   "ferramenta": "localizar_endereco",
+   "status": "encontrado"
+  },
+  {
+   "args": {
+    "enderecoid": "ACACLD0001",
+    "execution_id": "20261027-100000-abcde0-00001"
+   },
+   "ferramenta": "salvar_resultado_bpr",
+   "status": "registrado"
+  }
+ ],
+ "conclusoes_etapas": {},
+ "consolidacao": {
+  "CONCLUSAO_RESUMO": "Resumo da análise.",
+  "DADOS_INSUFICIENTES": [],
+  "DATA_REFERENCIA": "2026-10-27",
+  "DIVERGENCIAS": [],
+  "LOCALIZACAO_STATUS": "ENCONTRADO",
+  "RECOMENDACOES_PRELIMINARES": [
+   "Avaliar redução de AEV."
+  ]
+ },
+ "duracao_s": 4.2,
+ "enderecoid": "ACACLD0001",
+ "envelope": {
+  "campos_resultado": {
+   "CONCLUSAO_RESUMO": "Resumo da análise.",
+   "DADOS_INSUFICIENTES": [],
+   "DATA_REFERENCIA": "2026-10-27",
+   "DIVERGENCIAS": [],
+   "E1A1_STATUS": "CONCLUIDA",
+   "E1A2_STATUS": "CONCLUIDA",
+   "E2A1_STATUS": "CONCLUIDA",
+   "E2A2_STATUS": "CONCLUIDA",
+   "E3A1_STATUS": "CONCLUIDA",
+   "E3A2_STATUS": "CONCLUIDA",
+   "E3A3_STATUS": "CONCLUIDA",
+   "E3A4_STATUS": "CONCLUIDA",
+   "E4A1_STATUS": "CONCLUIDA",
+   "E4A2_DIFERENCA_AEV": 1.5,
+   "E4A2_STATUS": "CONCLUIDA",
+   "E5A1_STATUS": "CONCLUIDA",
+   "E5A2B_STATUS": "NAO_EXECUTADA",
+   "E5A2_STATUS": "CONCLUIDA",
+   "E5A3_STATUS": "CONCLUIDA",
+   "E6A1_STATUS": "CONCLUIDA",
+   "E6A2_STATUS": "CONCLUIDA",
+   "E6A3_STATUS": "CONCLUIDA",
+   "LOCALIZACAO_STATUS": "ENCONTRADO",
+   "RECOMENDACOES_PRELIMINARES": [
+    "Avaliar redução de AEV."
+   ]
+  },
+  "enderecoid": "ACACLD0001",
+  "execution_id": "20261027-100000-abcde0-00001",
+  "persistencia_motivo": null,
+  "persistencia_status": "registrado",
+  "status_execucao": "CONCLUIDA"
+ },
+ "erro": null,
+ "escopo": [
+  "E1A1",
+  "E1A2",
+  "E2A1",
+  "E2A2",
+  "E3A1",
+  "E3A2",
+  "E3A3",
+  "E3A4",
+  "E4A1",
+  "E4A2",
+  "E5A1",
+  "E5A2",
+  "E5A3",
+  "E6A1",
+  "E6A2",
+  "E6A3"
+ ],
+ "execution_id": "20261027-100000-abcde0-00001",
+ "fim": "2026-10-27T10:00:00-03:00",
+ "inicio": "2026-10-27T10:00:00-03:00",
+ "linha": {
+  "adicionais_redutiveis": null,
+  "alertas_coerencia": [],
+  "conclusao_resumo": "Resumo da análise.",
+  "diferenca_aev": 1.5,
+  "duracao_s": 4.2,
+  "enderecoid": "ACACLD0001",
+  "erro_execucao": null,
+  "erros_contrato": [],
+  "execution_id": "20261027-100000-abcde0-00001",
+  "fim": "2026-10-27T10:00:00-03:00",
+  "inicio": "2026-10-27T10:00:00-03:00",
+  "localizacao": "ENCONTRADO",
+  "lote_id": "20261027-100000-abcde0",
+  "necessidade_extracao": null,
+  "ocupacao_acima_franquia": null,
+  "persistencia": "registrado",
+  "persistencia_motivo": null,
+  "qtd_dados_insuficientes": 0,
+  "qtd_divergencias": 0,
+  "recomendacoes": [
+   "Avaliar redução de AEV."
+  ],
+  "rf_acima_limite": null,
+  "status_acoes": {
+   "1.1": "CONCLUIDA",
+   "1.2": "CONCLUIDA",
+   "2.1": "CONCLUIDA",
+   "2.2": "CONCLUIDA",
+   "3.1": "CONCLUIDA",
+   "3.2": "CONCLUIDA",
+   "3.3": "CONCLUIDA",
+   "3.4": "CONCLUIDA",
+   "4.1": "CONCLUIDA",
+   "4.2": "CONCLUIDA",
+   "5.1": "CONCLUIDA",
+   "5.2": "CONCLUIDA",
+   "5.2B": "NAO_EXECUTADA",
+   "5.3": "CONCLUIDA",
+   "6.1": "CONCLUIDA",
+   "6.2": "CONCLUIDA",
+   "6.3": "CONCLUIDA"
+  },
+  "tokens_entrada": 360000
+ },
+ "lote_id": "20261027-100000-abcde0",
+ "origem_envelope": "resposta_final",
+ "problemas": [],
+ "regravacoes": 0,
+ "tentativas": 1,
+ "tokens": {
+  "chamadas_modelo": 4,
+  "entrada": 360000,
+  "entrada_em_cache": 0,
+  "raciocinio": 8000,
+  "saida": 3200
+ }
+}

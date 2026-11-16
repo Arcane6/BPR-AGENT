@@ -1,0 +1,12 @@
+{
+ "sem_base": {
+  "enderecoid": "ACACLD0001",
+  "motivo": "Base resumida de documentos não encontrada: <DADOS>/Bases auxiliares/Base TSSR RCU Disponíveis.csv",
+  "status": "erro"
+ },
+ "sem_colunas": {
+  "enderecoid": "ACACLD0001",
+  "motivo": "Não foi possível abrir a base resumida de documentos: ValueError: Usecols do not match columns, columns expected but not found: ['CAMINHO', 'DATA_CRIACAO', 'ENDERECO_ID']",
+  "status": "erro"
+ }
+}

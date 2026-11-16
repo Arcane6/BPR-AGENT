@@ -1,0 +1,37 @@
+{
+ "lotes": [
+  {
+   "acoes": [
+    "E1A1",
+    "E1A2",
+    "E2A1",
+    "E2A2",
+    "E3A1",
+    "E3A2",
+    "E3A3",
+    "E3A4",
+    "E4A1",
+    "E4A2",
+    "E5A1",
+    "E5A2",
+    "E5A3",
+    "E6A1",
+    "E6A2",
+    "E6A3"
+   ],
+   "com_problema_de_contrato": 0,
+   "executados": 2,
+   "localizacao": {
+    "ENCONTRADO": 1,
+    "NAO_ENCONTRADO": 1
+   },
+   "lote_id": "20261027-100000-abcde0",
+   "origem": "tela",
+   "persistencia": {
+    "registrado": 2
+   },
+   "situacao": "concluido",
+   "total": 2
+  }
+ ]
+}

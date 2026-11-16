@@ -1,0 +1,204 @@
+{
+ "localizar_endereco": {
+  "description": "Localiza exatamente um ENDEREÇOID na base BPR.\n\nA ferramenta aceita um único identificador por chamada.\nA base completa permanece interna: o registro é devolvido ao agente para\nanálise, mas seus campos não são copiados automaticamente para o Excel.",
+  "name": "localizar_endereco",
+  "parameters_json_schema": {
+   "properties": {
+    "enderecoid": {
+     "title": "Enderecoid",
+     "type": "string"
+    }
+   },
+   "required": [
+    "enderecoid"
+   ],
+   "title": "localizar_enderecoParams",
+   "type": "object"
+  },
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ },
+ "localizar_enlaces_tx": {
+  "description": "Localiza e classifica todos os enlaces de transmissão associados\na um endereço.\n\nFonte:\n- arquivo CSV configurado em BASE_ENLACES_TX_PATH;\n- separador por vírgula;\n- cabeçalho na primeira linha.\n\nRegra de localização:\n- ENDID deve ser igual ao ENDEREÇOID recebido;\n- a comparação ignora diferenças entre letras maiúsculas\n  e minúsculas;\n- espaços antes e depois são desconsiderados.\n\nColunas consultadas:\n- ENLACE ID;\n- ENDID;\n- PLANO;\n- TAMANHO_ANTENA;\n- DISTANCIA;\n- AZIMUTE;\n- SITUAÇÃO.\n\nClassificação resumida:\n- ENLACE FIBRADO -> FIBRADO;\n- ENLACE PARCIALMENTE FIBRADO -> PARCIAL;\n- ENLACE NÃO FIBRADO -> NAO_FIBRADO;\n- demais valores -> OUTROS.\n\nCálculo do AEV sem coeficiente de arrasto:\n- TAMANHO_ANTENA representa o diâmetro;\n- AEV Sem CA = pi * (TAMANHO_ANTENA / 2) ** 2;\n- diâmetro igual a zero, ausente ou inválido resulta em null;\n- o AEV individual é apresentado com uma casa decimal;\n- os totais são somados antes do arredondamento e arredondados\n  para uma casa decimal apenas no final.\n\nA ferramenta apenas consulta, classifica e calcula os valores.\nEla não produz recomendações.",
+  "name": "localizar_enlaces_tx",
+  "parameters_json_schema": {
+   "properties": {
+    "enderecoid": {
+     "title": "Enderecoid",
+     "type": "string"
+    }
+   },
+   "required": [
+    "enderecoid"
+   ],
+   "title": "localizar_enlaces_txParams",
+   "type": "object"
+  },
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ },
+ "localizar_equipamentos_tssr_extraido": {
+  "description": "Consulta no BigQuery os equipamentos extraídos de um TSSR.\n\nA ferramenta trata o tipo do equipamento na seguinte precedência:\n\n1. DIPLEXER;\n2. ODU;\n3. RRU;\n4. TX;\n5. RF;\n6. tipo original.\n\nDepois classifica o grupo final:\n\n- RRU -> RRU;\n- RF -> RF;\n- TX -> TX;\n- ODU -> OUTROS;\n- DIPLEXER -> OUTROS;\n- demais tipos -> OUTROS.\n\nOs totais de quantidade e AEV por grupo consideram somente\nos registros em que Operator é igual a TIM.\n\nA quantidade corresponde à soma da coluna Quantity.\nO carregamento corresponde à soma da coluna TotalAEV.",
+  "name": "localizar_equipamentos_tssr_extraido",
+  "parameters_json_schema": {
+   "properties": {
+    "file_name": {
+     "title": "File Name",
+     "type": "string"
+    }
+   },
+   "required": [
+    "file_name"
+   ],
+   "title": "localizar_equipamentos_tssr_extraidoParams",
+   "type": "object"
+  },
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ },
+ "localizar_tssr_pendente_no_input": {
+  "description": "Procura na pasta de input um arquivo relacionado ao TSSR disponível\nmais recente que ainda precisa ser extraído.\n\nA ferramenta recebe o nome do TSSR disponível mais recente,\nnormalmente proveniente de:\n\nE5A2_NOME_TSSR_MAIS_RECENTE\n\nA busca:\n\n- considera somente arquivos diretamente dentro de TSSR_INPUT_DIR;\n- ignora a extensão durante a comparação nominal;\n- ignora diferenças entre letras maiúsculas e minúsculas;\n- ignora acentos;\n- trata espaço, hífen, sublinhado e pontuação como separadores;\n- preserva números, OC, site, tecnologia, frequências e revisão;\n- retorna todos os candidatos que atingirem o limiar mínimo;\n- identifica o melhor candidato geral;\n- identifica o melhor candidato em formato XLSX ou XLSM.\n\nFormatos processáveis:\n\n- .xlsx;\n- .xlsm.\n\nA ferramenta não executa a extração ou o processamento do TSSR.\nEla apenas localiza, compara e classifica os arquivos encontrados.",
+  "name": "localizar_tssr_pendente_no_input",
+  "parameters_json_schema": {
+   "properties": {
+    "nome_tssr": {
+     "title": "Nome Tssr",
+     "type": "string"
+    }
+   },
+   "required": [
+    "nome_tssr"
+   ],
+   "title": "localizar_tssr_pendente_no_inputParams",
+   "type": "object"
+  },
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ },
+ "localizar_tssrs_disponiveis": {
+  "description": "Localiza todos os documentos TSSR disponíveis para um endereço.\n\nA base CSV já foi previamente filtrada e resumida pelo Alteryx.\n\nA ferramenta filtra:\n- ENDERECO_ID igual ao endereço recebido;\n- TIPO igual a TSSR.\n\nRetorna somente:\n- OC;\n- DATA_CRIACAO;\n- CAMINHO.\n\nOs documentos são ordenados da data mais recente para a mais antiga.\nA ferramenta não decide se uma nova extração é necessária.",
+  "name": "localizar_tssrs_disponiveis",
+  "parameters_json_schema": {
+   "properties": {
+    "enderecoid": {
+     "title": "Enderecoid",
+     "type": "string"
+    }
+   },
+   "required": [
+    "enderecoid"
+   ],
+   "title": "localizar_tssrs_disponiveisParams",
+   "type": "object"
+  },
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ },
+ "localizar_tssrs_extraidos": {
+  "description": "Localiza todos os documentos TSSR já extraídos no BigQuery\npara um endereço.\n\nA ferramenta consulta:\n- projeto configurado em BIGQUERY_PROJECT_ID;\n- tabela configurada em BIGQUERY_TSSR_TABLE.\n\nA ferramenta filtra:\n- EndID igual ao endereço recebido.\n\nRetorna somente os nomes distintos encontrados em FileName.\n\nEsta ferramenta não:\n- compara os arquivos extraídos com os arquivos disponíveis;\n- avalia similaridade entre documentos;\n- decide se uma nova extração é necessária;\n- grava o resultado final da análise.",
+  "name": "localizar_tssrs_extraidos",
+  "parameters_json_schema": {
+   "properties": {
+    "enderecoid": {
+     "title": "Enderecoid",
+     "type": "string"
+    }
+   },
+   "required": [
+    "enderecoid"
+   ],
+   "title": "localizar_tssrs_extraidosParams",
+   "type": "object"
+  },
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ },
+ "obter_data_referencia": {
+  "description": "Retorna a data e a hora de referência da execução.\n\nO horário é calculado no fuso oficial configurado para a operação\nno Brasil:\n\nAmerica/Sao_Paulo\n\nEssa ferramenta deve ser chamada uma única vez no início da\nexecução. O agente deve reutilizar o retorno em todas as etapas\nque dependam de:\n\n- data atual;\n- ano atual;\n- mês atual;\n- comparação com vencimentos;\n- cálculo de idade de documentos;\n- análise de contratos;\n- classificação de eventos passados ou futuros;\n- registro da data de referência da análise.",
+  "name": "obter_data_referencia",
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ },
+ "processar_tssr_disponibilizado": {
+  "description": "Executa de forma síncrona o extrator de TSSR para um único arquivo.\n\nA chamada somente retorna depois que o subprocesso termina ou\nultrapassa TSSR_EXTRACTOR_TIMEOUT_SECONDS.\n\nO extrator mantém:\n\n- validações;\n- carga no BigQuery;\n- log CSV;\n- movimentação para Processados ou Error.\n\nO arquivo deve estar dentro da pasta Input e possuir extensão\n.xlsx ou .xlsm.",
+  "name": "processar_tssr_disponibilizado",
+  "parameters_json_schema": {
+   "properties": {
+    "caminho_arquivo": {
+     "title": "Caminho Arquivo",
+     "type": "string"
+    }
+   },
+   "required": [
+    "caminho_arquivo"
+   ],
+   "title": "processar_tssr_disponibilizadoParams",
+   "type": "object"
+  },
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ },
+ "salvar_resultado_bpr": {
+  "description": "Salva UM resultado BPR em UMA única linha do Excel, um campo por coluna.\n\nIMPORTANTE PARA FUNCTION CALLING:\n- campos_resultado deve ser um objeto JSON (dicionário) plano, com chaves exatamente iguais aos nomes de coluna documentados em CAMPOS_RESULTADO_NEGOCIO (ex.: \"E1A1_DETENTOR_UNANIME\").\n- Passe o objeto diretamente no argumento campos_resultado.\n- Não converta o objeto para string e não use json.dumps.\n- Não invente chaves fora do esquema oficial: a ferramenta rejeita chaves desconhecidas.\n- A ferramenta valida, normaliza cada valor para célula e grava a linha.\n\nO Excel contém somente:\n  - metadados básicos de identificação/execução;\n  - um campo de negócio por coluna, no esquema fixo definido pela constante CAMPOS_RESULTADO_NEGOCIO.\n\nNão exporta:\n  - colunas da base de dados;\n  - dicionário;\n  - registro bruto;\n  - parâmetros de negócio;\n  - chaves fora do esquema oficial.\n\nO esquema de colunas é fixo. Uma Ação nova exige atualizar CAMPOS_RESULTADO_NEGOCIO neste arquivo antes de ser usada.\n\nLimitação de concorrência:\n\n- a função abre, altera e salva novamente o arquivo completo;\n- o lock protege somente chamadas realizadas dentro do mesmo processo;\n- gravações simultâneas por processos, workers, agentes ou máquinas diferentes não são suportadas;\n- o orquestrador deve serializar as chamadas desta ferramenta;\n- falhas causadas por arquivo bloqueado ou indisponível são retornadas como erro e não devem gerar nova tentativa automática na mesma execução.",
+  "name": "salvar_resultado_bpr",
+  "parameters_json_schema": {
+   "properties": {
+    "agente_origem": {
+     "default": "agente_bpr",
+     "title": "Agente Origem",
+     "type": "string"
+    },
+    "campos_resultado": {
+     "additionalProperties": true,
+     "title": "Campos Resultado",
+     "type": "object"
+    },
+    "conclusao": {
+     "default": "ANALISE_CONCLUIDA",
+     "title": "Conclusao",
+     "type": "string"
+    },
+    "enderecoid": {
+     "title": "Enderecoid",
+     "type": "string"
+    },
+    "execution_id": {
+     "default": "",
+     "title": "Execution Id",
+     "type": "string"
+    },
+    "status": {
+     "default": "CONCLUIDA",
+     "title": "Status",
+     "type": "string"
+    }
+   },
+   "required": [
+    "enderecoid",
+    "campos_resultado"
+   ],
+   "title": "salvar_resultado_bprParams",
+   "type": "object"
+  },
+  "response_json_schema": {
+   "additionalProperties": true,
+   "type": "object"
+  }
+ }
+}

@@ -1,0 +1,58 @@
+{
+ "com_erro": {
+  "equipamentos": {
+   "carregamento_total_tim": null,
+   "enderecos_encontrados": [],
+   "equipamentos_outros": [],
+   "equipamentos_rf": [],
+   "equipamentos_rru": [],
+   "equipamentos_tx": [],
+   "equipamentos_tx_tim": [],
+   "file_name": "A.XLSX",
+   "motivo": "Erro ao consultar os equipamentos do TSSR no BigQuery: RuntimeError: quota",
+   "quantidade_registros": null,
+   "quantidade_rf_tim": null,
+   "quantidade_rru_tim": null,
+   "quantidade_tx_tim": null,
+   "status": "erro",
+   "total_aev_rf_tim": null,
+   "total_aev_rru_tim": null,
+   "total_aev_tx_tim": null
+  },
+  "extraidos": {
+   "documentos": [],
+   "enderecoid": "ACACLD0001",
+   "motivo": "Erro ao consultar os TSSRs extraídos no BigQuery: RuntimeError: quota",
+   "quantidade_documentos": null,
+   "status": "erro"
+  }
+ },
+ "sem_configuracao": {
+  "equipamentos": {
+   "carregamento_total_tim": null,
+   "enderecos_encontrados": [],
+   "equipamentos_outros": [],
+   "equipamentos_rf": [],
+   "equipamentos_rru": [],
+   "equipamentos_tx": [],
+   "equipamentos_tx_tim": [],
+   "file_name": "A.XLSX",
+   "motivo": "Erro ao consultar os equipamentos do TSSR no BigQuery: RuntimeError: BPR_BIGQUERY_PROJECT_ID não configurado.",
+   "quantidade_registros": null,
+   "quantidade_rf_tim": null,
+   "quantidade_rru_tim": null,
+   "quantidade_tx_tim": null,
+   "status": "erro",
+   "total_aev_rf_tim": null,
+   "total_aev_rru_tim": null,
+   "total_aev_tx_tim": null
+  },
+  "extraidos": {
+   "documentos": [],
+   "enderecoid": "ACACLD0001",
+   "motivo": "Erro ao consultar os TSSRs extraídos no BigQuery: RuntimeError: BPR_BIGQUERY_PROJECT_ID não configurado.",
+   "quantidade_documentos": null,
+   "status": "erro"
+  }
+ }
+}

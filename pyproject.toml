@@ -1,0 +1,29 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+# F, E e W: erros reais e estilo do pycodestyle. B (bugbear): armadilhas
+# como closure em laço e zip de tamanhos diferentes. Entraram na fase F2b
+# (docs/MAPEAMENTO.md, achado F4), depois de o código passar pela reforma.
+select = ["F", "E", "W", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# O texto destes arquivos é o prompt do agente, espaços inclusive. Mexer
+# no formato muda o que o modelo lê.
+"agente_bpr/instructions.py" = ["E501", "W291", "W293"]
+"agente_bpr/dicionario.py" = ["E501", "W291"]
+"agente_bpr/agent.py" = ["E501"]
+"orquestrador_bpr/instrucoes.py" = ["E501"]
+# As regras de extração legadas ficam como vieram (tests/dourados/extrator/).
+"agente_bpr/extracao_tssr_agent.py" = ["E501"]
+# O SQL desta ferramenta está congelado nos dourados, linha em branco inclusive.
+"agente_bpr/ferramentas/tssr.py" = ["W293"]
+# Docstrings de ferramenta são a descrição que o modelo lê (dourado
+# contrato/declaracoes_das_ferramentas.json).
+"agente_bpr/ferramentas/persistencia.py" = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "tests"]
+addopts = "-q"

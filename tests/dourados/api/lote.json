@@ -1,0 +1,269 @@
+{
+ "em_execucao": [],
+ "erro": null,
+ "linhas": [
+  {
+   "adicionais_redutiveis": null,
+   "alertas_coerencia": [],
+   "conclusao_resumo": "Resumo da análise.",
+   "diferenca_aev": 1.5,
+   "duracao_s": 4.2,
+   "enderecoid": "ACACLD0001",
+   "erro_execucao": null,
+   "erros_contrato": [],
+   "execution_id": "20261027-100000-abcde0-00001",
+   "fim": "2026-10-27T10:00:00-03:00",
+   "inicio": "2026-10-27T10:00:00-03:00",
+   "localizacao": "ENCONTRADO",
+   "lote_id": "20261027-100000-abcde0",
+   "necessidade_extracao": null,
+   "ocupacao_acima_franquia": null,
+   "persistencia": "registrado",
+   "persistencia_motivo": null,
+   "qtd_dados_insuficientes": 0,
+   "qtd_divergencias": 0,
+   "recomendacoes": [
+    "Avaliar redução de AEV."
+   ],
+   "rf_acima_limite": null,
+   "status_acoes": {
+    "1.1": "CONCLUIDA",
+    "1.2": "CONCLUIDA",
+    "2.1": "CONCLUIDA",
+    "2.2": "CONCLUIDA",
+    "3.1": "CONCLUIDA",
+    "3.2": "CONCLUIDA",
+    "3.3": "CONCLUIDA",
+    "3.4": "CONCLUIDA",
+    "4.1": "CONCLUIDA",
+    "4.2": "CONCLUIDA",
+    "5.1": "CONCLUIDA",
+    "5.2": "CONCLUIDA",
+    "5.2B": "NAO_EXECUTADA",
+    "5.3": "CONCLUIDA",
+    "6.1": "CONCLUIDA",
+    "6.2": "CONCLUIDA",
+    "6.3": "CONCLUIDA"
+   },
+   "tokens_entrada": 360000
+  },
+  {
+   "adicionais_redutiveis": null,
+   "alertas_coerencia": [],
+   "conclusao_resumo": "Resumo da análise.",
+   "diferenca_aev": null,
+   "duracao_s": 4.2,
+   "enderecoid": "ACACLD0002",
+   "erro_execucao": null,
+   "erros_contrato": [],
+   "execution_id": "20261027-100000-abcde0-00002",
+   "fim": "2026-10-27T10:00:00-03:00",
+   "inicio": "2026-10-27T10:00:00-03:00",
+   "localizacao": "NAO_ENCONTRADO",
+   "lote_id": "20261027-100000-abcde0",
+   "necessidade_extracao": null,
+   "ocupacao_acima_franquia": null,
+   "persistencia": "registrado",
+   "persistencia_motivo": null,
+   "qtd_dados_insuficientes": 0,
+   "qtd_divergencias": 0,
+   "recomendacoes": [],
+   "rf_acima_limite": null,
+   "status_acoes": {
+    "1.1": "NAO_EXECUTADA",
+    "1.2": "NAO_EXECUTADA",
+    "2.1": "NAO_EXECUTADA",
+    "2.2": "NAO_EXECUTADA",
+    "3.1": "NAO_EXECUTADA",
+    "3.2": "NAO_EXECUTADA",
+    "3.3": "NAO_EXECUTADA",
+    "3.4": "NAO_EXECUTADA",
+    "4.1": "NAO_EXECUTADA",
+    "4.2": "NAO_EXECUTADA",
+    "5.1": "NAO_EXECUTADA",
+    "5.2": "NAO_EXECUTADA",
+    "5.2B": "NAO_EXECUTADA",
+    "5.3": "NAO_EXECUTADA",
+    "6.1": "NAO_EXECUTADA",
+    "6.2": "NAO_EXECUTADA",
+    "6.3": "NAO_EXECUTADA"
+   },
+   "tokens_entrada": 360000
+  }
+ ],
+ "lote_id": "20261027-100000-abcde0",
+ "pedido": {
+  "avisos": [
+   "Extração de TSSR desligada: a Ação 5.3 usará o TSSR já extraído, mesmo que exista um mais recente pendente."
+  ],
+  "concorrencia": 1,
+  "criado_em": "2026-10-27T10:00:00-03:00",
+  "enderecos": [
+   "ACACLD0001",
+   "ACACLD0002"
+  ],
+  "escopo": {
+   "avisos": [
+    "Extração de TSSR desligada: a Ação 5.3 usará o TSSR já extraído, mesmo que exista um mais recente pendente."
+   ],
+   "codigos": [
+    "ETAPA_01_ACAO_01_CONSISTENCIA_DETENTOR",
+    "ETAPA_01_ACAO_02_CONSISTENCIA_ADICIONAIS",
+    "ETAPA_02_ACAO_01_VIGENCIA_CONTRATUAL",
+    "ETAPA_02_ACAO_02_ADICIONAIS_REDUTIVEIS",
+    "ETAPA_03_ACAO_01_SITUACAO_FINANCEIRA",
+    "ETAPA_03_ACAO_02_SITUACAO_OPERACIONAL",
+    "ETAPA_03_ACAO_03_FOCO_DA_ANALISE",
+    "ETAPA_03_ACAO_04_CASOS_PARA_DISTRATO",
+    "ETAPA_04_ACAO_01_AVALIACAO_ULTIMA_SCI",
+    "ETAPA_04_ACAO_02_FRANQUIA_E_OCUPACAO",
+    "ETAPA_05_ACAO_01_CONSULTAR_TSSRS_DISPONIVEIS",
+    "ETAPA_05_ACAO_02_COMPARAR_TSSRS_DISPONIVEIS_E_EXTRAIDOS",
+    "ETAPA_05_ACAO_03_CONSULTAR_EQUIPAMENTOS_TSSR",
+    "ETAPA_06_ACAO_01_VERIFICAR_LIMITE_RF_POR_TECNOLOGIA",
+    "ETAPA_06_ACAO_02_CONSULTAR_E_CLASSIFICAR_ENLACES_TX",
+    "ETAPA_06_ACAO_03_CRUZAR_TX_TSSR_COM_ENLACES"
+   ],
+   "executar": [
+    "E1A1",
+    "E1A2",
+    "E2A1",
+    "E2A2",
+    "E3A1",
+    "E3A2",
+    "E3A3",
+    "E3A4",
+    "E4A1",
+    "E4A2",
+    "E5A1",
+    "E5A2",
+    "E5A3",
+    "E6A1",
+    "E6A2",
+    "E6A3"
+   ],
+   "permitir_extracao": false,
+   "solicitadas": [
+    "E1A1",
+    "E1A2",
+    "E2A1",
+    "E2A2",
+    "E3A1",
+    "E3A2",
+    "E3A3",
+    "E3A4",
+    "E4A1",
+    "E4A2",
+    "E5A1",
+    "E5A2",
+    "E5A3",
+    "E6A1",
+    "E6A2",
+    "E6A3"
+   ]
+  },
+  "lote_id": "20261027-100000-abcde0",
+  "origem": "tela",
+  "pulados_ja_gravados": [],
+  "repetidos_ignorados": [
+   "acacld0001"
+  ]
+ },
+ "pendentes": [],
+ "progresso": {
+  "concluidos": 2,
+  "total": 2
+ },
+ "resumo": {
+  "avisos": [
+   "Extração de TSSR desligada: a Ação 5.3 usará o TSSR já extraído, mesmo que exista um mais recente pendente."
+  ],
+  "com_problema_de_contrato": 0,
+  "escopo": {
+   "avisos": [
+    "Extração de TSSR desligada: a Ação 5.3 usará o TSSR já extraído, mesmo que exista um mais recente pendente."
+   ],
+   "codigos": [
+    "ETAPA_01_ACAO_01_CONSISTENCIA_DETENTOR",
+    "ETAPA_01_ACAO_02_CONSISTENCIA_ADICIONAIS",
+    "ETAPA_02_ACAO_01_VIGENCIA_CONTRATUAL",
+    "ETAPA_02_ACAO_02_ADICIONAIS_REDUTIVEIS",
+    "ETAPA_03_ACAO_01_SITUACAO_FINANCEIRA",
+    "ETAPA_03_ACAO_02_SITUACAO_OPERACIONAL",
+    "ETAPA_03_ACAO_03_FOCO_DA_ANALISE",
+    "ETAPA_03_ACAO_04_CASOS_PARA_DISTRATO",
+    "ETAPA_04_ACAO_01_AVALIACAO_ULTIMA_SCI",
+    "ETAPA_04_ACAO_02_FRANQUIA_E_OCUPACAO",
+    "ETAPA_05_ACAO_01_CONSULTAR_TSSRS_DISPONIVEIS",
+    "ETAPA_05_ACAO_02_COMPARAR_TSSRS_DISPONIVEIS_E_EXTRAIDOS",
+    "ETAPA_05_ACAO_03_CONSULTAR_EQUIPAMENTOS_TSSR",
+    "ETAPA_06_ACAO_01_VERIFICAR_LIMITE_RF_POR_TECNOLOGIA",
+    "ETAPA_06_ACAO_02_CONSULTAR_E_CLASSIFICAR_ENLACES_TX",
+    "ETAPA_06_ACAO_03_CRUZAR_TX_TSSR_COM_ENLACES"
+   ],
+   "executar": [
+    "E1A1",
+    "E1A2",
+    "E2A1",
+    "E2A2",
+    "E3A1",
+    "E3A2",
+    "E3A3",
+    "E3A4",
+    "E4A1",
+    "E4A2",
+    "E5A1",
+    "E5A2",
+    "E5A3",
+    "E6A1",
+    "E6A2",
+    "E6A3"
+   ],
+   "permitir_extracao": false,
+   "solicitadas": [
+    "E1A1",
+    "E1A2",
+    "E2A1",
+    "E2A2",
+    "E3A1",
+    "E3A2",
+    "E3A3",
+    "E3A4",
+    "E4A1",
+    "E4A2",
+    "E5A1",
+    "E5A2",
+    "E5A3",
+    "E6A1",
+    "E6A2",
+    "E6A3"
+   ]
+  },
+  "executados": 2,
+  "localizacao": {
+   "ENCONTRADO": 1,
+   "NAO_ENCONTRADO": 1
+  },
+  "lote_id": "20261027-100000-abcde0",
+  "persistencia": {
+   "registrado": 2
+  },
+  "pulados_ja_gravados": 0,
+  "recomendacoes_mais_frequentes": [
+   [
+    "Avaliar redução de AEV.",
+    1
+   ]
+  ],
+  "repetidos_ignorados": 1,
+  "tokens": {
+   "chamadas_modelo": 8,
+   "entrada": 720000,
+   "entrada_em_cache": 0,
+   "raciocinio": 16000,
+   "saida": 6400
+  },
+  "total_recebido": 3
+ },
+ "situacao": "concluido"
+}

@@ -1,0 +1,44 @@
+{
+ "caixa_e_espaco": {
+  "enderecoid": "acacld0001",
+  "registro": {
+   "BH_Detentor": "ATC | Proprietário",
+   "BH_Fim": "2027-03-01T00:00:00",
+   "BH_Status": "Base",
+   "BH_Valor": 1500.5,
+   "ENDEREÇOID": "ACACLD0001"
+  },
+  "status": "encontrado"
+ },
+ "duplicado": {
+  "enderecoid": "ACACLD0002",
+  "quantidade": 2,
+  "status": "duplicado"
+ },
+ "encontrado": {
+  "enderecoid": "ACACLD0001",
+  "registro": {
+   "BH_Detentor": "ATC | Proprietário",
+   "BH_Fim": "2027-03-01T00:00:00",
+   "BH_Status": "Base",
+   "BH_Valor": 1500.5,
+   "ENDEREÇOID": "ACACLD0001"
+  },
+  "status": "encontrado"
+ },
+ "nan_vira_null": {
+  "enderecoid": "ACACLD0003",
+  "registro": {
+   "ENDEREÇOID": "ACACLD0003"
+  },
+  "status": "encontrado"
+ },
+ "nao_encontrado": {
+  "enderecoid": "ACACLD9999",
+  "status": "nao_encontrado"
+ },
+ "vazio": {
+  "motivo": "ENDEREÇOID não informado.",
+  "status": "erro"
+ }
+}

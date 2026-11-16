@@ -1,0 +1,163 @@
+{
+ "encontrado": {
+  "carregamento_total_tim": 6.1,
+  "enderecos_encontrados": [
+   "ACACLD0001",
+   "ACACLD0002"
+  ],
+  "equipamentos_outros": [
+   {
+    "aev": 0.5,
+    "aev_total": null,
+    "altura_instalacao": 30.0,
+    "azimute": 120.0,
+    "enderecoid": "ACACLD0001",
+    "file_name": "TSSR OC 875367.XLSX",
+    "modelo": "DIPLEXER",
+    "operadora": "TIM",
+    "quantidade": 1.0,
+    "tecnologia": "4G",
+    "tipo_equipamento": "OUTROS",
+    "tipo_equipamento_original": "ANTENA"
+   },
+   {
+    "aev": 0.5,
+    "aev_total": null,
+    "altura_instalacao": 30.0,
+    "azimute": 120.0,
+    "enderecoid": "ACACLD0001",
+    "file_name": "TSSR OC 875367.XLSX",
+    "modelo": null,
+    "operadora": "TIM",
+    "quantidade": null,
+    "tecnologia": "4G",
+    "tipo_equipamento": null,
+    "tipo_equipamento_original": "ANTENA"
+   }
+  ],
+  "equipamentos_rf": [
+   {
+    "aev": 0.5,
+    "aev_total": 3.6,
+    "altura_instalacao": 30.0,
+    "azimute": 120.0,
+    "enderecoid": "ACACLD0001",
+    "file_name": "TSSR OC 875367.XLSX",
+    "modelo": "ANTENA RF 4T",
+    "operadora": "TIM",
+    "quantidade": 6.0,
+    "tecnologia": "4G",
+    "tipo_equipamento": "RF",
+    "tipo_equipamento_original": "ANTENA"
+   },
+   {
+    "aev": 0.5,
+    "aev_total": 1.0,
+    "altura_instalacao": 30.0,
+    "azimute": 120.0,
+    "enderecoid": "ACACLD0002",
+    "file_name": "TSSR OC 875367.XLSX",
+    "modelo": "ANTENA RF",
+    "operadora": "CLARO",
+    "quantidade": 2.0,
+    "tecnologia": "4G",
+    "tipo_equipamento": "RF",
+    "tipo_equipamento_original": "ANTENA"
+   }
+  ],
+  "equipamentos_rru": [
+   {
+    "aev": 0.5,
+    "aev_total": 1.2,
+    "altura_instalacao": 30.0,
+    "azimute": 120.0,
+    "enderecoid": "ACACLD0001",
+    "file_name": "TSSR OC 875367.XLSX",
+    "modelo": "RRU 5502",
+    "operadora": "TIM",
+    "quantidade": 3.0,
+    "tecnologia": "4G",
+    "tipo_equipamento": "RRU",
+    "tipo_equipamento_original": "ANTENA"
+   },
+   {
+    "aev": 0.5,
+    "aev_total": 0.4,
+    "altura_instalacao": 30.0,
+    "azimute": 120.0,
+    "enderecoid": "ACACLD0001",
+    "file_name": "TSSR OC 875367.XLSX",
+    "modelo": "RRU 3965",
+    "operadora": "tim",
+    "quantidade": 1.0,
+    "tecnologia": "4G",
+    "tipo_equipamento": "RRU",
+    "tipo_equipamento_original": "ANTENA"
+   }
+  ],
+  "equipamentos_tx": [
+   {
+    "aev": 0.5,
+    "aev_total": 0.9,
+    "altura_instalacao": 30.0,
+    "azimute": 120.0,
+    "enderecoid": "ACACLD0001",
+    "file_name": "TSSR OC 875367.XLSX",
+    "modelo": "MW 0.6",
+    "operadora": "TIM",
+    "quantidade": 2.0,
+    "tecnologia": "4G",
+    "tipo_equipamento": "TX",
+    "tipo_equipamento_original": "ANTENA"
+   }
+  ],
+  "equipamentos_tx_tim": [
+   {
+    "aev": 0.5,
+    "aev_total": 0.9,
+    "altura_instalacao": 30.0,
+    "azimute": 120.0,
+    "enderecoid": "ACACLD0001",
+    "file_name": "TSSR OC 875367.XLSX",
+    "modelo": "MW 0.6",
+    "operadora": "TIM",
+    "quantidade": 2.0,
+    "tecnologia": "4G",
+    "tipo_equipamento": "TX",
+    "tipo_equipamento_original": "ANTENA"
+   }
+  ],
+  "file_name": "TSSR OC 875367.XLSX",
+  "quantidade_registros": 7,
+  "quantidade_rf_tim": 6.0,
+  "quantidade_rru_tim": 4.0,
+  "quantidade_tx_tim": 2.0,
+  "status": "encontrado",
+  "total_aev_rf_tim": 3.6,
+  "total_aev_rru_tim": 1.6,
+  "total_aev_tx_tim": 0.9
+ },
+ "nao_encontrado": {
+  "carregamento_total_tim": null,
+  "enderecos_encontrados": [],
+  "equipamentos_outros": [],
+  "equipamentos_rf": [],
+  "equipamentos_rru": [],
+  "equipamentos_tx": [],
+  "equipamentos_tx_tim": [],
+  "file_name": "NADA.XLSX",
+  "quantidade_registros": 0,
+  "quantidade_rf_tim": null,
+  "quantidade_rru_tim": null,
+  "quantidade_tx_tim": null,
+  "status": "nao_encontrado",
+  "total_aev_rf_tim": null,
+  "total_aev_rru_tim": null,
+  "total_aev_tx_tim": null
+ },
+ "sql": "\n    WITH equipamentos_tratados AS (\n        SELECT\n            FileName,\n            EndID,\n            Operator,\n            Technology,\n            EquipmentType AS EquipmentTypeOriginal,\n            Model,\n            Azimuth,\n            HeightInstall,\n            Quantity,\n            AEV,\n            TotalAEV,\n\n            CASE\n                WHEN\n                    STRPOS(\n                        UPPER(\n                            COALESCE(\n                                CAST(Model AS STRING),\n                                ''\n                            )\n                        ),\n                        'DIPLEX'\n                    ) > 0\n                    OR\n                    STRPOS(\n                        UPPER(\n                            COALESCE(\n                                CAST(Model AS STRING),\n                                ''\n                            )\n                        ),\n                        'TRIPLEX'\n                    ) > 0\n                THEN 'DIPLEXER'\n                \n                WHEN REGEXP_CONTAINS(\n                    UPPER(\n                        COALESCE(\n                            CAST(Model AS STRING),\n                            ''\n                        )\n                    ),\n                    r'(^|[^A-Z0-9])ODU([^A-Z0-9]|$)'\n                )\n                THEN 'ODU'\n\n                WHEN STRPOS(\n                    UPPER(\n                        COALESCE(\n                            CAST(Model AS STRING),\n                            ''\n                        )\n                    ),\n                    'RRU'\n                ) > 0\n                THEN 'RRU'\n\n                WHEN STRPOS(\n                    UPPER(\n                        COALESCE(\n                            CAST(Model AS STRING),\n                            ''\n                        )\n                    ),\n                    'MW'\n                ) > 0\n                THEN 'TX'\n\n                WHEN REGEXP_CONTAINS(\n                    UPPER(\n                        COALESCE(\n                            CAST(Model AS STRING),\n                            ''\n                        )\n                    ),\n                    r'(^|[^A-Z0-9])TX([^A-Z0-9]|$)'\n                )\n                THEN 'TX'\n\n                WHEN REGEXP_CONTAINS(\n                    UPPER(\n                        COALESCE(\n                            CAST(Model AS STRING),\n                            ''\n                        )\n                    ),\n                    r'(^|[^A-Z0-9])RF([^A-Z0-9]|$)'\n                )\n                THEN 'RF'\n\n                WHEN STRPOS(\n                    UPPER(\n                        COALESCE(\n                            CAST(EquipmentType AS STRING),\n                            ''\n                        )\n                    ),\n                    'MW'\n                ) > 0\n                THEN 'TX'\n\n                ELSE UPPER(\n                    TRIM(\n                        COALESCE(\n                            CAST(EquipmentType AS STRING),\n                            ''\n                        )\n                    )\n                )\n            END AS EquipmentTypeTratado\n\n        FROM `projeto-teste.dataset_teste.VW_AEV_TSSR_Equipamentos_Comp`\n\n        WHERE UPPER(\n            TRIM(\n                CAST(FileName AS STRING)\n            )\n        ) = UPPER(\n            TRIM(@file_name)\n        )\n    )\n\n    SELECT\n        FileName,\n        EndID,\n        Operator,\n        Technology,\n        EquipmentTypeOriginal,\n        EquipmentTypeTratado,\n        Model,\n        Azimuth,\n        HeightInstall,\n        Quantity,\n        AEV,\n        TotalAEV,\n\n        CASE\n            WHEN EquipmentTypeTratado = 'RRU'\n            THEN 'RRU'\n\n            WHEN EquipmentTypeTratado = 'RF'\n            THEN 'RF'\n\n            WHEN EquipmentTypeTratado = 'TX'\n            THEN 'TX'\n\n            ELSE 'OUTROS'\n        END AS GrupoEquipamento\n\n    FROM equipamentos_tratados\n\n    ORDER BY\n        GrupoEquipamento,\n        Operator,\n        Technology,\n        EquipmentTypeTratado,\n        Model,\n        Azimuth,\n        HeightInstall\n    ",
+ "vazio": {
+  "motivo": "FileName não informado.",
+  "status": "erro"
+ }
+}

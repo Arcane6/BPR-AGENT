@@ -1,0 +1,35 @@
+{
+ "cargas": [],
+ "consultas": [
+  {
+   "parametros": {
+    "file_name": "TSSR OC 875367 RBOAJ7.XLSX"
+   },
+   "sql": "\n        SELECT DISTINCT FileName\n        FROM `projeto-teste.dataset_teste.AEV_TSSR_InfoSites`\n        WHERE UPPER(TRIM(CAST(FileName AS STRING))) = @file_name\n    "
+  },
+  {
+   "parametros": {
+    "file_name": "TSSR OC 875367 RBOAJ7.XLSX"
+   },
+   "sql": "\n        SELECT DISTINCT FileName\n        FROM `projeto-teste.dataset_teste.AEV_TSSR_Equipamentos`\n        WHERE UPPER(TRIM(CAST(FileName AS STRING))) = @file_name\n    "
+  }
+ ],
+ "destino": [
+  "Error/TSSR OC 875367 RBOAJ7.xlsx"
+ ],
+ "log": [
+  {
+   "Arquivo": "TSSR OC 875367 RBOAJ7.XLSX",
+   "DetentorEV": "",
+   "EndId": "ACACLD0001",
+   "Mensagem": "CAPA não encontrada",
+   "Status": "Sem CAPA"
+  }
+ ],
+ "resposta": {
+  "arquivo_permanece_no_input": null,
+  "movido_para": "Error",
+  "resultado": "PROCESSAMENTO_REPROVADO",
+  "status": "concluido_com_erro"
+ }
+}

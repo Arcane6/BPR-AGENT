@@ -1,0 +1,32 @@
+{
+ "nao_e_pasta": {
+  "arquivo_candidato": null,
+  "caminho_candidato": null,
+  "candidatos": [],
+  "extensao_candidato": null,
+  "formato_processavel": null,
+  "motivo": "O caminho configurado para input não representa uma pasta: <DADOS>/TSSR/Input",
+  "nome_tssr_procurado": "TSSR OC 875367",
+  "pasta_input": "<DADOS>/TSSR/Input",
+  "recomendacao": "Verificar a configuração da pasta de input do TSSR.",
+  "resultado": "CAMINHO_INPUT_INVALIDO",
+  "similaridade": null,
+  "status": "erro",
+  "tipo_correspondencia": null
+ },
+ "sem_pasta": {
+  "arquivo_candidato": null,
+  "caminho_candidato": null,
+  "candidatos": [],
+  "extensao_candidato": null,
+  "formato_processavel": null,
+  "motivo": "A pasta de input não foi encontrada: <DADOS>/TSSR/Input",
+  "nome_tssr_procurado": "TSSR OC 875367",
+  "pasta_input": "<DADOS>/TSSR/Input",
+  "recomendacao": "Disponibilizar o TSSR mais recente na pasta de input em formato XLSX.",
+  "resultado": "PASTA_INPUT_NAO_ENCONTRADA",
+  "similaridade": null,
+  "status": "erro",
+  "tipo_correspondencia": null
+ }
+}

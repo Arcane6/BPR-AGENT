@@ -1,0 +1,8 @@
+{
+ "lote_em_andamento": null,
+ "lote_fora_da_tela": false,
+ "modelo_agente": "gemini-2.5-flash",
+ "modelo_orquestrador": "gemini-2.5-flash",
+ "saida_dir": "/caminho/saida_orquestrador",
+ "status": "ok"
+}

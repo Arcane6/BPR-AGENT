@@ -1,0 +1,7 @@
+# Dependências de desenvolvimento: o lock de produção mais teste e lint.
+#   uv pip compile requirements-dev.in --universal --python-version 3.11 -o requirements-dev.txt
+-r requirements.txt
+pytest==8.4.2
+# TestClient do FastAPI (tests/test_servidor.py).
+httpx==0.28.1
+ruff==0.16.8

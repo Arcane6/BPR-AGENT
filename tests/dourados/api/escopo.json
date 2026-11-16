@@ -1,0 +1,24 @@
+{
+ "avisos": [
+  "Extração de TSSR desligada: a Ação 5.3 usará o TSSR já extraído, mesmo que exista um mais recente pendente.",
+  "Incluídas como dependência: 5.1, 5.2, 5.3, 6.2"
+ ],
+ "codigos": [
+  "ETAPA_05_ACAO_01_CONSULTAR_TSSRS_DISPONIVEIS",
+  "ETAPA_05_ACAO_02_COMPARAR_TSSRS_DISPONIVEIS_E_EXTRAIDOS",
+  "ETAPA_05_ACAO_03_CONSULTAR_EQUIPAMENTOS_TSSR",
+  "ETAPA_06_ACAO_02_CONSULTAR_E_CLASSIFICAR_ENLACES_TX",
+  "ETAPA_06_ACAO_03_CRUZAR_TX_TSSR_COM_ENLACES"
+ ],
+ "executar": [
+  "E5A1",
+  "E5A2",
+  "E5A3",
+  "E6A2",
+  "E6A3"
+ ],
+ "permitir_extracao": false,
+ "solicitadas": [
+  "E6A3"
+ ]
+}

@@ -1,0 +1,137 @@
+[
+ {
+  "codigo": "endereco_divergente",
+  "mensagem": "Envelope com enderecoid 'OUTRO'; esperado 'ACACLD0001'.",
+  "severidade": "erro"
+ },
+ {
+  "codigo": "execution_id_divergente",
+  "mensagem": "Envelope com execution_id 'x'; esperado 'exec-1'.",
+  "severidade": "erro"
+ },
+ {
+  "codigo": "status_execucao_invalido",
+  "mensagem": "status_execucao inesperado: 'PARCIAL'.",
+  "severidade": "erro"
+ },
+ {
+  "codigo": "motivo_com_sucesso",
+  "mensagem": "persistencia_motivo preenchido com gravação registrada.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "chaves_fora_do_schema",
+  "mensagem": "Chaves fora do schema: ['CAMPO_INVENTADO'].",
+  "severidade": "erro"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "1.1 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "1.2 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "2.1 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "2.2 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "3.1 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "3.2 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "3.3 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "3.4 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "4.1 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "4.2 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "5.2B não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "erro"
+ },
+ {
+  "codigo": "acao_fora_do_escopo_executada",
+  "mensagem": "6.1 não foi pedida e terminou como CONCLUIDA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "recomendacao_nao_consolidada",
+  "mensagem": "E3A4_RECOMENDACAO_PRELIMINAR não aparece literalmente em RECOMENDACOES_PRELIMINARES.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e1a2_com_adicional",
+  "mensagem": "E1A2_COM_ADICIONAL = False com valor Housing 120.0.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e2a1_vigencia",
+  "mensagem": "E2A1_CONTRATO_VIGENTE = True com fim 2026-01-31 e referência 2026-10-27.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e4a2_diferenca",
+  "mensagem": "E4A2_DIFERENCA_AEV = 1.0; esperado 1.5.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e4a2_situacao",
+  "mensagem": "E4A2_SITUACAO_FRANQUIA = ABAIXO_DA_FRANQUIA; esperado ACIMA_DA_FRANQUIA.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e4a2_indicador",
+  "mensagem": "E4A2_OCUPACAO_ACIMA_FRANQUIA incoerente com os valores.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e6a1_limite",
+  "mensagem": "E6A1_LIMITE_RF = 4; esperado 7.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e6a1_excedente",
+  "mensagem": "E6A1_EXCEDENTE_RF = 2; esperado 5.0.",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e6a1_copia",
+  "mensagem": "E6A1_QUANTIDADE_RF_TIM (9.0) difere de E5A3_QUANTIDADE_RF_TIM (8.0).",
+  "severidade": "alerta"
+ },
+ {
+  "codigo": "e6a3_balanco",
+  "mensagem": "E6A3_BALANCO_VALIDADO = true, mas 5.0 != soma dos grupos 4.0.",
+  "severidade": "alerta"
+ }
+]
