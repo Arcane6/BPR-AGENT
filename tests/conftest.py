@@ -21,6 +21,7 @@ import pytest
 RAIZ = Path(__file__).resolve().parents[1]
 DADOS = Path(tempfile.mkdtemp(prefix="bpr-dados-"))
 SAIDA = Path(tempfile.mkdtemp(prefix="bpr-saida-"))
+AUDITORIA = Path(tempfile.mkdtemp(prefix="bpr-auditoria-"))
 
 
 def _variaveis_do_exemplo():
@@ -46,12 +47,21 @@ def pytest_configure(config):
         "BPR_BIGQUERY_DATASET": "dataset_teste",
         "ORQ_SAIDA_DIR": str(SAIDA),
         "ORQ_ESPERA_GRAVACAO_S": "0",
+        # A trilha dos testes não pode cair na pasta auditoria/ do projeto.
+        "BPR_AUDITORIA_DIR": str(AUDITORIA),
     })
 
 
 def pytest_unconfigure(config):
+    import atexit
+
+    from seguranca_bpr.auditoria import TRILHA
+
+    # A âncora da saída escreveria no log do pytest, já fechado.
+    atexit.unregister(TRILHA.ancorar)
     shutil.rmtree(DADOS, ignore_errors=True)
     shutil.rmtree(SAIDA, ignore_errors=True)
+    shutil.rmtree(AUDITORIA, ignore_errors=True)
 
 
 @pytest.fixture

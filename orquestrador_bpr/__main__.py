@@ -17,8 +17,11 @@ import json
 import sys
 from pathlib import Path
 
+from seguranca_bpr import auditoria, logs
+from seguranca_bpr.limites import UsoNegado
+
 from .catalogo_acoes import AcaoDesconhecida, catalogo_para_exibicao, resolver_escopo
-from .lote import executar_lote, ler_arquivo_enderecos
+from .lote import LoteEmAndamento, executar_lote, ler_arquivo_enderecos
 from .preflight import verificar_ambiente
 
 
@@ -49,6 +52,7 @@ def _argumentos(argv: list[str] | None) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = _argumentos(argv)
+    logs.configurar()
 
     if args.listar_acoes:
         for a in catalogo_para_exibicao():
@@ -115,10 +119,18 @@ def main(argv: list[str] | None = None) -> int:
               f"erros_contrato={erros} {resultado.duracao_s:.0f}s"
               + (f" ERRO: {resultado.erro}" if resultado.erro else ""))
 
-    resumo = asyncio.run(executar_lote(
-        enderecos, acoes=acoes or None, parametros_negocio=parametros,
-        permitir_extracao=args.permitir_extracao, concorrencia=args.concorrencia,
-        pular_gravados_em=args.pular_gravados, saida_dir=args.saida, ao_concluir=progresso))
+    auditoria.registrar_protecoes("protecoes_ao_subir", origem="linha_de_comando")
+    try:
+        resumo = asyncio.run(executar_lote(
+            enderecos, acoes=acoes or None, parametros_negocio=parametros,
+            permitir_extracao=args.permitir_extracao, concorrencia=args.concorrencia,
+            pular_gravados_em=args.pular_gravados, saida_dir=args.saida,
+            ao_concluir=progresso, origem="linha_de_comando"))
+    except (LoteEmAndamento, UsoNegado) as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+    finally:
+        auditoria.registrar_protecoes("protecoes_ao_descer", origem="linha_de_comando")
 
     print(json.dumps(resumo.contagens(), ensure_ascii=False, indent=2, default=str))
     print(f"Saída: {resumo.pasta}")

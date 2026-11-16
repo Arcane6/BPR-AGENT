@@ -18,6 +18,8 @@ from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.table import Table, TableStyleInfo
 
+from seguranca_bpr.planilha import proteger_linha
+
 from .. import config
 from .comum import celula_a_partir_de, normalizar_id
 
@@ -439,6 +441,9 @@ def salvar_resultado_bpr(
             }
             ws.append([valores.get(nome) for nome in cabecalhos])
             linha = ws.max_row
+            # Texto do modelo que começa com "=" seria gravado como fórmula
+            # e rodaria em quem abrir o Excel (seguranca_bpr/planilha.py).
+            proteger_linha(ws[linha])
             _formatar_planilha_resultados(ws, cabecalhos, linha)
             wb.save(caminho)
 

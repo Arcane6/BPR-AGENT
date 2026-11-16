@@ -15,6 +15,8 @@ select = ["F", "E", "W", "B"]
 "agente_bpr/dicionario.py" = ["E501", "W291"]
 "agente_bpr/agent.py" = ["E501"]
 "orquestrador_bpr/instrucoes.py" = ["E501"]
+# As regras de segurança no fim do prompt (texto que o modelo lê).
+"seguranca_bpr/injecao.py" = ["E501"]
 # As regras de extração legadas ficam como vieram (tests/dourados/extrator/).
 "agente_bpr/extracao_tssr_agent.py" = ["E501"]
 # O SQL desta ferramenta está congelado nos dourados, linha em branco inclusive.

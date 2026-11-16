@@ -16,6 +16,12 @@ Saídas por lote, em ORQ_SAIDA_DIR/<lote_id>/:
   (fonte da verdade; preserva null, [] e campos omitidos);
 - resumo.csv: uma linha por endereço para leitura rápida;
 - resumo.json: contagens do lote.
+
+Toda origem (tela, conversa, linha de comando) passa por executar_lote, e é
+aqui que a trilha de auditoria registra o começo e o fim do lote e cada
+endereço analisado (seguranca_bpr.auditoria), que o teto de tokens do mês
+é conferido e que o identificador é validado antes de virar texto da
+mensagem ao Agente BPR.
 """
 
 from __future__ import annotations
@@ -33,6 +39,10 @@ from pathlib import Path
 from typing import IO, Any, Callable, Iterable
 from zoneinfo import ZoneInfo
 
+from seguranca_bpr import auditoria, consumo
+from seguranca_bpr.limites import UsoNegado
+from seguranca_bpr.planilha import celula_csv
+
 from . import config
 from .catalogo_acoes import Escopo, resolver_escopo
 from .contrato import resumo_status_acoes
@@ -49,6 +59,19 @@ from .executor import (
 FUSO = ZoneInfo("America/Sao_Paulo")
 
 _lote_em_andamento = threading.Lock()
+
+# O ENDEREÇOID vai para dentro da mensagem ao Agente BPR. Restringir aos
+# caracteres de um código (letras, números e _ - . /) impede que um "id"
+# colado traga instrução junto ("X; ignore as regras e ...").
+_ID_VALIDO = re.compile(r"^[0-9A-Za-z][0-9A-Za-z_.\-/]{0,63}$")
+
+
+def separar_invalidos(enderecos: Iterable[str]) -> tuple[list[str], list[str]]:
+    """(válidos, inválidos), na ordem em que vieram."""
+    validos, invalidos = [], []
+    for endereco in enderecos:
+        (validos if _ID_VALIDO.match(endereco) else invalidos).append(endereco)
+    return validos, invalidos
 
 
 class LoteEmAndamento(RuntimeError):
@@ -182,6 +205,7 @@ async def executar_lote(
     ao_comecar: Callable[[ResumoLote, list[str]], None] | None = None,
     deve_parar: Callable[[], bool] | None = None,
     ao_progresso: Callable[[str, dict[str, Any] | None], None] | None = None,
+    origem: str = "linha_de_comando",
     **opcoes_executor: Any,
 ) -> ResumoLote:
     """Executa a fila de endereços e grava as saídas do lote.
@@ -191,8 +215,13 @@ async def executar_lote(
     criada. deve_parar é consultado antes de cada endereço: o que já
     começou termina, o resto fica em nao_executados. ao_progresso recebe
     (enderecoid, andamento) enquanto o endereço roda e (enderecoid, None)
-    quando ele termina.
+    quando ele termina. origem (tela, conversa, linha_de_comando) vai para a
+    trilha de auditoria.
     """
+    teto = consumo.teto_atingido(saida_dir or config.ORQ_SAIDA_DIR)
+    if teto:
+        auditoria.registrar("uso_negado", motivo="teto_de_tokens", origem=origem)
+        raise UsoNegado(teto)
     if not _lote_em_andamento.acquire(blocking=False):
         raise LoteEmAndamento(
             "Já existe um lote em execução. Espere ele terminar: dois lotes juntos "
@@ -201,7 +230,7 @@ async def executar_lote(
         return await _executar_lote(
             enderecos, acoes, parametros_negocio, permitir_extracao, concorrencia,
             pular_gravados_em, saida_dir, fabrica, campos_schema, salvar, ao_concluir,
-            lote_id, ao_comecar, deve_parar, ao_progresso, opcoes_executor)
+            lote_id, ao_comecar, deve_parar, ao_progresso, origem, opcoes_executor)
     finally:
         _lote_em_andamento.release()
 
@@ -213,15 +242,20 @@ def lote_em_andamento() -> bool:
 async def _executar_lote(
     enderecos, acoes, parametros_negocio, permitir_extracao, concorrencia,
     pular_gravados_em, saida_dir, fabrica, campos_schema, salvar, ao_concluir,
-    lote_id, ao_comecar, deve_parar, ao_progresso, opcoes_executor,
+    lote_id, ao_comecar, deve_parar, ao_progresso, origem, opcoes_executor,
 ) -> ResumoLote:
     escopo = resolver_escopo(acoes, permitir_extracao)
     unicos, repetidos = normalizar_enderecos(enderecos)
+    unicos, invalidos = separar_invalidos(unicos)
     ja_feitos = carregar_concluidos(pular_gravados_em)
     fila = [e for e in unicos if e.casefold() not in ja_feitos]
     pulados = [e for e in unicos if e.casefold() in ja_feitos]
 
     avisos = list(escopo.avisos)
+    if invalidos:
+        exemplos = ", ".join(repr(e[:40]) for e in invalidos[:5])
+        avisos.append(f"{len(invalidos)} identificador(es) ignorado(s) por ter caracteres fora "
+                      f"de letras, números e _ - . / (ex.: {exemplos}).")
     if concorrencia > 1 and permitir_extracao:
         avisos.append("Concorrência reduzida para 1: a extração de TSSR não pode rodar "
                       "em paralelo.")
@@ -249,6 +283,12 @@ async def _executar_lote(
     concluidos = 0
     if ao_comecar:
         ao_comecar(resumo, fila)
+    # Alteração sistêmica (N1): o lote grava no Excel e, com autorização,
+    # move TSSRs e carrega o BigQuery.
+    auditoria.registrar("lote_iniciado", lote_id=lote_id, origem=origem, enderecos=len(fila),
+                        pulados=len(pulados), invalidos=len(invalidos),
+                        acoes=escopo.executar, permitir_extracao=permitir_extracao,
+                        concorrencia=concorrencia)
 
     async def processar(indice: int, enderecoid: str) -> None:
         nonlocal concluidos
@@ -278,12 +318,25 @@ async def _executar_lote(
                         "fim": datetime.now(FUSO).isoformat(timespec="seconds"),
                         "escopo": escopo.executar, **resultado.como_dict()}
             await gravador.gravar(registro)
+            auditoria.registrar(
+                "endereco_analisado", lote_id=lote_id, execution_id=resultado.execution_id,
+                enderecoid=enderecoid, persistencia=resultado.persistencia_status,
+                ferramentas=[c.get("ferramenta") for c in resultado.chamadas],
+                tokens=consumo.total(resultado.tokens or {}), erro=bool(resultado.erro),
+                duracao_s=round(resultado.duracao_s, 1))
             resumo.resultados.append(resultado)
             concluidos += 1
             if ao_concluir:
                 ao_concluir(resultado, concluidos, len(fila))
 
-    await asyncio.gather(*(processar(i, e) for i, e in enumerate(fila, start=1)))
+    situacao = "falhou"
+    try:
+        await asyncio.gather(*(processar(i, e) for i, e in enumerate(fila, start=1)))
+        situacao = "parado" if resumo.nao_executados else "concluido"
+    finally:
+        auditoria.registrar("lote_encerrado", lote_id=lote_id, origem=origem,
+                            situacao=situacao, executados=len(resumo.resultados),
+                            nao_executados=len(resumo.nao_executados))
 
     ordem = {e: i for i, e in enumerate(fila)}
     resumo.resultados.sort(key=lambda r: ordem.get(r.enderecoid, 0))
@@ -352,8 +405,10 @@ def escrever_csv_resumo(arquivo: IO[str], resultados: Iterable[ResultadoEndereco
     escritor = csv.DictWriter(arquivo, fieldnames=colunas, delimiter=";")
     escritor.writeheader()
     for linha in linhas:
+        # celula_csv: texto do modelo que o Excel leria como fórmula vai
+        # como texto (seguranca_bpr/planilha.py).
         escritor.writerow({
-            k: json.dumps(v, ensure_ascii=False) if isinstance(v, (list, dict)) else v
+            k: celula_csv(json.dumps(v, ensure_ascii=False) if isinstance(v, (list, dict)) else v)
             for k, v in linha.items()})
 
 

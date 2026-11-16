@@ -34,6 +34,10 @@ Este módulo traz quatro peças, ligadas em agent.py:
   deixa análises diferentes rodarem ao mesmo tempo.
 
 Nada disso muda a resposta de uma execução que segue a instrução.
+
+Toda recusa dos guards vai para a trilha de auditoria (ferramenta_bloqueada,
+seguranca_bpr.auditoria): uma tentativa de extração não autorizada ou de
+gravar duas vezes fica com data, máquina e execução.
 """
 
 from __future__ import annotations
@@ -43,6 +47,8 @@ import functools
 import inspect
 import weakref
 from typing import Any, Callable
+
+from seguranca_bpr import auditoria
 
 # Espelho de orquestrador_bpr/executor.py:LIMITES_CHAMADAS, que audita a
 # mesma regra depois da execução. Mudam juntos (tests/test_guardas.py
@@ -89,6 +95,13 @@ def _bloqueio(resultado: str, motivo: str) -> dict[str, Any]:
     }
 
 
+def _registrar_bloqueio(nome: str, bloqueio: dict[str, Any], tool_context: Any) -> None:
+    auditoria.registrar(
+        "ferramenta_bloqueada", ferramenta=nome, motivo=bloqueio["resultado"],
+        execution_id=tool_context.state.get(ESTADO_EXECUTION_ID),
+        invocation_id=getattr(tool_context, "invocation_id", ""))
+
+
 def _nome_arquivo(args: dict[str, Any]) -> str:
     return str(args.get("file_name") or "").strip().upper()
 
@@ -99,12 +112,14 @@ def antes_da_ferramenta(tool: Any, args: dict[str, Any], tool_context: Any) -> d
     estado = tool_context.state
 
     if nome in FERRAMENTAS_EXTRACAO and estado.get(ESTADO_PERMITIR_EXTRACAO) is False:
-        return _bloqueio(
+        bloqueio = _bloqueio(
             "EXTRACAO_NAO_AUTORIZADA",
             "Extração de TSSR não autorizada pelo orquestrador nesta execução. "
             "Registre E5A2B_STATUS = \"NAO_EXECUTADA\" e siga para a Ação 5.3 "
             "com o resultado da Ação 5.2.",
         )
+        _registrar_bloqueio(nome, bloqueio, tool_context)
+        return bloqueio
 
     # A contagem é por execução (invocation): a mesma sessão do adk web
     # pode ter várias análises seguidas, e cada uma começa do zero.
@@ -136,6 +151,8 @@ def antes_da_ferramenta(tool: Any, args: dict[str, Any], tool_context: Any) -> d
     # Atribuição da chave inteira: é o que o ADK registra como mudança de
     # estado (mexer no dict por dentro não seria gravado).
     estado[ESTADO_CONTAGEM] = {**registro, "contagem": contagem, "arquivos": arquivos}
+    if bloqueio:
+        _registrar_bloqueio(nome, bloqueio, tool_context)
     return bloqueio
 
 
@@ -189,6 +206,10 @@ def ferramenta_inexistente(tool: Any, args: dict[str, Any], tool_context: Any,
     if inexistentes > LIMITE_FERRAMENTA_INEXISTENTE:
         return None
 
+    auditoria.registrar("ferramenta_bloqueada", ferramenta=getattr(tool, "name", ""),
+                        motivo="FERRAMENTA_INEXISTENTE",
+                        execution_id=estado.get(ESTADO_EXECUTION_ID),
+                        invocation_id=getattr(tool_context, "invocation_id", ""))
     agente = getattr(getattr(tool_context, "_invocation_context", None), "agent", None)
     disponiveis = sorted(
         getattr(f, "__name__", None) or getattr(f, "name", "")

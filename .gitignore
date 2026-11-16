@@ -6,6 +6,8 @@
 # própria.
 dados/
 saida_orquestrador/
+# Trilha de auditoria e medições: ficam na máquina, não no git.
+auditoria/
 *.jsonl
 
 __pycache__/
