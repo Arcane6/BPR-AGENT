@@ -1,0 +1,28 @@
+# Dependências diretas do Agente BPR e do orquestrador. O lock é o
+# requirements.txt, gerado a partir daqui:
+#   uv pip compile requirements.in --universal --python-version 3.11 -o requirements.txt
+# Dependência nova entra aqui, e o lock é gerado de novo.
+
+# Agentes (mesma versão do portal, coverage-hub/backend).
+google-adk==2.5.0
+
+# Fontes: Excel e CSV das bases, BigQuery dos TSSRs.
+google-cloud-bigquery==3.42.2
+# O BigQuery converte resultado em DataFrame (to_dataframe) e carrega
+# DataFrame (load_table_from_dataframe) por estes dois.
+db-dtypes
+pyarrow
+pandas==2.3.1
+numpy
+openpyxl==3.1.5
+python-dotenv==1.2.2
+
+# API local e tela (servidor_bpr). Já vinham com o google-adk; ficam
+# explícitos porque o servidor usa direto. Upload de arquivo: multipart.
+fastapi==0.141.1
+uvicorn==0.54.0
+python-multipart==0.0.32
+
+# Extrator legado de TSSR.
+tqdm
+pillow

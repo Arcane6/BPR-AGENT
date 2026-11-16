@@ -1,0 +1,837 @@
+# -*- coding: utf-8 -*-
+"""Dicionário de colunas da base "Base de dados do Agente BPR" (aba Base, 96 colunas, cabeçalho na linha 1)."""
+
+
+DICIONARIO_COLUNAS = {
+    # =========================================================================
+    # 1. IDENTIFICACAO E CONTEXTO DO ENDERECO
+    # =========================================================================
+    1: {
+        "nome": 'ENDEREÇOID',
+        "descricao": 'Identificador único do endereço.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Entrada obrigatória, filtro da consulta e chave de rastreabilidade.',
+    },
+    2: {
+        "nome": 'BH_Status',
+        "descricao": 'Situação do endereço na base Housing.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Validar se o endereço está ativo (Base), em Distrato parcial, já Distratado ou se não se aplica pagamento de Housing (NA Housing).',
+    },
+    3: {
+        "nome": 'BH_Rede',
+        "descricao": 'Rede ou domínio associado ao endereço.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Contextualizar o domínio do endereço.',
+    },
+    4: {
+        "nome": 'BH_Detentor',
+        "descricao": 'Detentor da infraestrutura e solo do endereço, concatenados com "|".',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Identificar o detentor de infraestrutura e solo do endereço.'
+    },
+    5: {
+        "nome": 'BH_IBGE',
+        "descricao": 'Código IBGE associado ao município a qual pertence o endereço.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Relacionamento geográfico com bases complementares.',
+    },
+    6: {
+        "nome": 'BH_Tipo de Infra',
+        "descricao": 'Tipo físico ou construtivo da infraestrutura.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Contextualizar contratação.',
+    },
+    7: {
+        "nome": 'BH_Tipo de Compartilhamento',
+        "descricao": 'Modalidade de compartilhamento da contratação do endereço.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Contextualizar o modelo de compartilhamento.',
+    },
+
+    # =========================================================================
+    # 2. VALORES FINANCEIROS DE HOUSING
+    # =========================================================================
+    8: {
+        "nome": 'BH_Valor Total Sharing',
+        "descricao": 'Valor total do pagamento de sharing do endereço.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Analisar a parcela financeira de sharing.',
+    },
+    9: {
+        "nome": 'BH_Valor Total Adicional',
+        "descricao": 'Valor total de adicionais contratados.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Identificar valor adicional pago.',
+    },
+    10: {
+        "nome": 'BH_Valor Rental',
+        "descricao": 'Valor de rental ou aluguel pago para uso do endereço.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Compor a leitura financeira do endereço.',
+    },
+    11: {
+        "nome": 'BH_Valor Real State',
+        "descricao": 'Valor do componente de Real Estate pago em torres TIM.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Compor a leitura financeira do endereço.',
+    },
+    12: {
+        "nome": 'BH_Total Housing',
+        "descricao": 'Valor total consolidado de Housing, pago para uso do endereço.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Referência consolidada de valor final total.',
+    },
+
+    # =========================================================================
+    # 3. CONTRATACAO E CARREGAMENTO DE HOUSING
+    # =========================================================================
+    13: {
+        "nome": 'BH_M²',
+        "descricao": 'Medida de ocupação em metros quadrados registrada em Housing.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm²',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Referência de área ocupada do endereço.',
+    },
+    14: {
+        "nome": 'BH_SOLO contratual',
+        "descricao": 'Área de solo disponível contratualmente.',
+        "tipo_esperado": 'decimal ou texto',
+        "unidade": 'm²',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Comparar contratação e utilização de solo.',
+    },
+    15: {
+        "nome": 'BH_AEV contratual',
+        "descricao": 'AEV disponível contratualmente para ser ocupada sem pagamento de adicionais.',
+        "tipo_esperado": 'decimal ou texto',
+        "unidade": 'm² de AEV',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Comparar contratação e utilização de AEV.',
+    },
+    16: {
+        "nome": 'BH_AEV contratual_Trat',
+        "descricao": 'AEV contratual tratado e padronizado.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Comparações numéricas quando a regra indicar a fonte Base Housing.',
+    },
+    17: {
+        "nome": 'BH_CA',
+        "descricao": 'Referência para inclusão do coeficiente de arrasto na ocupação prevista em contrato.',
+        "tipo_esperado": 'texto',
+        "unidade": 'conforme contrato',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Determinar se o carregamento do endereço precisa ser calculado considerando ou não coeficiente de arrasto.',
+    },
+    18: {
+        "nome": 'BH_Faixa contratual',
+        "descricao": 'Faixa contratual disponível para o carregamento.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Identificar regra ou faixa de ocupação contratual na torre.',
+    },
+    19: {
+        "nome": 'BH_CW / BW',
+        "descricao": 'Referência contratual CW ou BW.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Rastrear contrato ou documento associado ao endereço.',
+    },
+
+    # =========================================================================
+    # 4. VIGENCIA CONTRATUAL
+    # =========================================================================
+    20: {
+        "nome": 'BH_Fim Contrato Detentor I',
+        "descricao": 'Data final do contrato principal com o detentor.',
+        "tipo_esperado": 'data',
+        "unidade": 'data',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Avaliar a vigência contratual na etapa apropriada.',
+    },
+    21: {
+        "nome": 'DEINF_FIM_CONTRATO',
+        "descricao": 'Data final de contrato registrada na DEINF.',
+        "tipo_esperado": 'data',
+        "unidade": 'data',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Comparar vigência com as demais fontes.',
+    },
+    22: {
+        "nome": 'BH_FIM CONTRATO SHARING',
+        "descricao": 'Data final do contrato de sharing a ser considerada nas análises.',
+        "tipo_esperado": 'data',
+        "unidade": 'data',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Concluir sobre a vigência do contrato do endereço.',
+    },
+    23: {
+        "nome": 'BH_FIM CONTRATO FAIXA',
+        "descricao": 'Faixa categórica da vigência contratual.',
+        "tipo_esperado": 'texto',
+        "unidade": 'status',
+        "origem": 'Base Housing',
+        "uso_na_analise": 'Avaliar faixa de classificação da vigência contratual.',
+    },
+
+    # =========================================================================
+    # 5. DADOS DEINF
+    # =========================================================================
+    24: {
+        "nome": 'DEINF_DETENTOR',
+        "descricao": 'Detentor registrado na DEINF.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Validar ou sinalizar divergência de detentor.',
+    },
+    25: {
+        "nome": 'DEINF_SITE_TIM',
+        "descricao": 'Identificador do site TIM na DEINF.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Relacionar o endereço com outras fontes internas.',
+    },
+    26: {
+        "nome": 'DEINF_SITE_OPERADORA',
+        "descricao": 'Identificador do site da operadora ou detentora.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Relacionar o endereço com outras fontes internas.',
+    },
+    27: {
+        "nome": 'DEINF_CONT_TERRENO_M2',
+        "descricao": 'Área de terreno contratada.',
+        "tipo_esperado": 'texto',
+        "unidade": 'm²',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Comparar terreno contratado e ocupado.',
+    },
+    28: {
+        "nome": 'DEINF_OCUP_TERRENO_M2',
+        "descricao": 'Área de terreno ocupada.',
+        "tipo_esperado": 'texto',
+        "unidade": 'm²',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Avaliar utilização de terreno segundo a DEINF.',
+    },
+    29: {
+        "nome": 'DEINF_OCUP_PREDIO_M2',
+        "descricao": 'Área ocupada em prédio.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm²',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Avaliar utilização de prédio segundo a DEINF.',
+    },
+    30: {
+        "nome": 'DEINF_CONT_TORRE_M2',
+        "descricao": 'Área ou AEV de torre contratado.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Comparar contratação e ocupação da torre.',
+    },
+    31: {
+        "nome": 'DEINF_OCUP_TORRE_M2',
+        "descricao": 'Área ou AEV ocupado na torre.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Avaliar carregamento utilizado na fonte DEINF.',
+    },
+    32: {
+        "nome": 'DEINF_NUM_OPERADORAS',
+        "descricao": 'Quantidade de operadoras no endereço.',
+        "tipo_esperado": 'inteiro',
+        "unidade": 'operadoras',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Contextualizar compartilhamento do endereço.',
+    },
+    33: {
+        "nome": 'DEINF_VALOR_RS',
+        "descricao": 'Valor principal registrado na DEINF.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Leitura financeira da fonte DEINF.',
+    },
+    34: {
+        "nome": 'DEINF_VALOR_ALUGUEL',
+        "descricao": 'Valor de aluguel registrado na DEINF.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Valor de aluguel cobrado.',
+    },
+    35: {
+        "nome": 'DEINF_VALOR_COMPART',
+        "descricao": 'Valor de compartilhamento registrado na DEINF.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Valor de compartilhamento cobrado.',
+    },
+    36: {
+        "nome": 'DEINF_VALOR_ADICIONAL',
+        "descricao": 'Valor adicional registrado na DEINF.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Valor de adicionais cobrados.',
+    },
+    37: {
+        "nome": 'DEINF_VALOR_TOTAL',
+        "descricao": 'Valor total consolidado na DEINF.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Valor total cobrado.',
+    },
+    38: {
+        "nome": 'DEINF_EXCED_TERRENO_M2',
+        "descricao": 'Excedente de terreno ocupado, além da franquia.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm²',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Identificar excedente na ocupação do terreno em relação a franquia.',
+    },
+    39: {
+        "nome": 'DEINF_EXCED_TORRE_M2',
+        "descricao": 'Excedente de torre ocupada, além da franquia.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Identificar excedente na ocupação da torre em relação a franquia.',
+    },
+    40: {
+        "nome": 'DEINF_EXCED_TERRENO_RS',
+        "descricao": 'Valor financeiro de excedente de terreno.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Avaliar impacto financeiro registrado.',
+    },
+    41: {
+        "nome": 'DEINF_EXCED_TORRE_RS',
+        "descricao": 'Valor financeiro de excedente de torre.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'DEINF',
+        "uso_na_analise": 'Avaliar impacto financeiro registrado.',
+    },
+
+    # =========================================================================
+    # 6. CONTEXTO OPERACIONAL DA BASE ÚNICA
+    # =========================================================================
+    42: {
+        "nome": 'BU_TIPO_SITE',
+        "descricao": 'Tipo de endereço.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Diferenciar classes de endereço com tipos diferentes.',
+    },
+    43: {
+        "nome": 'BU_FUNÇÃO',
+        "descricao": 'Função ou situação operacional do site.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Contextualizar o uso operacional.',
+    },
+    44: {
+        "nome": 'BU_TECNOLOGIA',
+        "descricao": 'Tecnologias presentes no endereço.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Contextualizar o carregamento e o uso da infraestrutura.',
+    },
+    45: {
+        "nome": 'BU_MEIO_TX_ATUAL',
+        "descricao": 'Meio de transmissão atual.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Contextualizar a função do site.',
+    },
+    46: {
+        "nome": 'BU_EMS_ACESSO',
+        "descricao": 'Quantidade de elementos de acesso ativos em gerência.',
+        "tipo_esperado": 'inteiro',
+        "unidade": 'elementos',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Compor a leitura operacional do endereço.',
+    },
+    47: {
+        "nome": 'BU_EMS_TX_MW',
+        "descricao": 'Quantidade de elementos de transmissão MW ativos em gerência.',
+        "tipo_esperado": 'inteiro',
+        "unidade": 'elementos',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Compor a leitura operacional do endereço.',
+    },
+    48: {
+        "nome": 'BU_EMS_TX_OUTROS',
+        "descricao": 'Quantidade de outros elementos de transmissão ativos em gerência.',
+        "tipo_esperado": 'inteiro',
+        "unidade": 'elementos',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Compor a leitura operacional do endereço.',
+    },
+    49: {
+        "nome": 'BU_EMS_CORE',
+        "descricao": 'Quantidade de elementos de core ativos em gerência.',
+        "tipo_esperado": 'inteiro',
+        "unidade": 'elementos',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Compor a leitura operacional do endereço.',
+    },
+    50: {
+        "nome": 'BU_EMS_TOTAL',
+        "descricao": 'Quantidade total de elementos de rede ativos em gerência.',
+        "tipo_esperado": 'inteiro',
+        "unidade": 'elementos',
+        "origem": 'Base Única',
+        "uso_na_analise": 'Resumo da presença operacional no endereço.',
+    },
+
+    # =========================================================================
+    # 7. DADOS DOCUMENTAIS RCU
+    # =========================================================================
+    51: {
+        "nome": 'RCU_FileName',
+        "descricao": 'Nome do arquivo RCU mais recente utilizado como fonte para extração dos dados.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'RCU',
+        "uso_na_analise": 'Rastreabilidade documental.',
+    },    
+    52: {
+        "nome": 'RCU_CompanyName',
+        "descricao": 'Detentora identificada no documento.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'RCU',
+        "uso_na_analise": 'Comparar com os detentores das demais fontes.',
+    },
+    53: {
+        "nome": 'RCU_BaseFeeValue',
+        "descricao": 'Valor base fee extraído.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'RCU',
+        "uso_na_analise": 'Análise financeira documental.',
+    },
+    54: {
+        "nome": 'RCU_AdditionalAevValue',
+        "descricao": 'Valor de adicionais contratados nessa RCU.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'RCU',
+        "uso_na_analise": 'Análise de adicional de AEV.',
+    },
+    55: {
+        "nome": 'RCU_RentValue',
+        "descricao": 'Valor de aluguel extraído.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'RCU',
+        "uso_na_analise": 'Análise financeira documental.',
+    },
+    56: {
+        "nome": 'RCU_TotalAdditionalAevValue',
+        "descricao": 'Valor total dos adicionais de AEV contratados.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'RCU',
+        "uso_na_analise": 'Análise financeira documental.',
+    },
+    57: {
+        "nome": 'RCU_CA',
+        "descricao": 'Condição de adição ou não do coeficiente de arrasto.',
+        "tipo_esperado": 'texto ou decimal',
+        "unidade": 'conforme documento',
+        "origem": 'RCU',
+        "uso_na_analise": 'Definir o cenário documental de AEV.',
+    },
+    58: {
+        "nome": 'RCU_ContractedAev_OR',
+        "descricao": 'Valor original de AEV contratado extraído.',
+        "tipo_esperado": 'texto ou decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'RCU',
+        "uso_na_analise": 'Rastreabilidade do valor original.',
+    },
+    59: {
+        "nome": 'RCU_ContractedAev',
+        "descricao": 'AEV contratado tratado a partir do valor original.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'RCU',
+        "uso_na_analise": 'Comparação documental do contratado.',
+    },
+    60: {
+        "nome": 'RCU_UsedAev',
+        "descricao": 'AEV utilizado identificado no RCU.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'RCU',
+        "uso_na_analise": 'Comparação documental da utilização.',
+    },
+    61: {
+        "nome": 'RCU_AdditionalAev',
+        "descricao": 'AEV adicional identificado.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'RCU',
+        "uso_na_analise": 'Identificar adicional documental.',
+    },
+    62: {
+        "nome": 'RCU_TotalAev',
+        "descricao": 'AEV total consolidado.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'RCU',
+        "uso_na_analise": 'Referência total da fonte RCU.',
+    },
+    63: {
+        "nome": 'RCU_FinalAEV_SemCA',
+        "descricao": 'AEV final sem aplicação de CA.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'RCU',
+        "uso_na_analise": 'Cenário documental sem CA.',
+    },
+    64: {
+        "nome": 'RCU_FinalAEV_ComCA',
+        "descricao": 'AEV final com aplicação de CA.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'RCU',
+        "uso_na_analise": 'Cenário documental com CA.',
+    },
+    65: {
+        "nome": 'RCU_FinalSolo',
+        "descricao": 'Área final de solo identificada.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm²',
+        "origem": 'RCU',
+        "uso_na_analise": 'Referência documental de solo.',
+    },
+
+    # =========================================================================
+    # 8. DADOS DOCUMENTAIS TSSR
+    # =========================================================================
+    66: {
+        "nome": 'TSSR_NDA_AEV_FINAL',
+        "descricao": 'AEV ocupado sem coeficiente de arrasto.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'TSSR',
+        "uso_na_analise": 'Valor do carregamento considerado no último documento.',
+    },
+    67: {
+        "nome": 'TSSR_DA_AEV_FINAL',
+        "descricao": 'AEV ocupado com coeficiente de arrasto.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'TSSR',
+        "uso_na_analise": 'Evidência técnica complementar.',
+    },
+    68: {
+        "nome": 'TSSR_FileName',
+        "descricao": 'Nome do arquivo TSSR utilizado como fonte, o último lido.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'TSSR',
+        "uso_na_analise": 'Rastreabilidade documental.',
+    },
+
+    # =========================================================================
+    # 9. DADOS LEASED SERVICES
+    # =========================================================================
+    69: {
+        "nome": 'LS_ALUGUEL_RS',
+        "descricao": 'Valor de aluguel.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Comparação de valores nas diferentes fontes.',
+    },
+    70: {
+        "nome": 'LS_RATEIO_RS',
+        "descricao": 'Valor de rateio do valor total.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Comparação de valores nas diferentes fontes.',
+    },
+    71: {
+        "nome": 'LS_COMPARTILHAMENTO_RS',
+        "descricao": 'Valor de compartilhamento.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Comparação de valores nas diferentes fontes.',
+    },
+    72: {
+        "nome": 'LS_AEV - VALOR PROPOSTA R$',
+        "descricao": 'Valor proposto de AEV.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Avaliar proposta financeira de AEV.',
+    },
+    73: {
+        "nome": 'LS_SOLO - VALOR PROPOSTO R$',
+        "descricao": 'Valor proposto para solo.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Avaliar proposta financeira de solo.',
+    },
+    74: {
+        "nome": 'LS_FORA DA FAIXA - VALOR PROPOSTO',
+        "descricao": 'Valor proposto fora da faixa contratual.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Avaliar proposta fora da faixa.',
+    },
+    75: {
+        "nome": 'LS_TAXA DE HABILITAÇÃO',
+        "descricao": 'Taxa de habilitação registrada.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Compor leitura financeira da proposta.',
+    },
+    76: {
+        "nome": 'LS_AEV CONTRATUAL',
+        "descricao": 'Valor de AEV contratual.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Comparação de valores nas diferentes fontes.',
+    },
+    77: {
+        "nome": 'LS_AEV UTILIZADO',
+        "descricao": 'Valor de AEV utilizado.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Comparação de valores nas diferentes fontes.',
+    },
+    78: {
+        "nome": 'LS_AEV ADICIONAL',
+        "descricao": 'Valor de AEV adicional.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Comparação de valores nas diferentes fontes.',
+    },
+    79: {
+        "nome": 'LS_SOLO CONTRATUAL',
+        "descricao": 'Área de solo contratual.',
+        "tipo_esperado": 'texto',
+        "unidade": 'm²',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Comparação de valores nas diferentes fontes.',
+    },
+    80: {
+        "nome": 'LS_SOLO UTILIZADO',
+        "descricao": 'Área de solo utilizada.',
+        "tipo_esperado": 'texto',
+        "unidade": 'm²',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Comparação de valores nas diferentes fontes.',
+    },
+    81: {
+        "nome": 'LS_SOLO ADICIONAL PROPOSTO',
+        "descricao": 'Área adicional de solo proposta.',
+        "tipo_esperado": 'texto',
+        "unidade": 'm²',
+        "origem": 'LEASED SERVICES',
+        "uso_na_analise": 'Avaliar proposta de solo adicional.',
+    },
+
+    # =========================================================================
+    # 10. PROCESSOS SCI
+    # =========================================================================
+    82: {
+        "nome": 'SCI_Protocolo SCI',
+        "descricao": 'Número do último protocolo SCI aberto.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'SCI',
+        "uso_na_analise": 'Identificar último protocolo SCI aberto.',
+    },
+    83: {
+        "nome": 'SCI_Data Protocolo',
+        "descricao": 'Data de protocolo.',
+        "tipo_esperado": 'data',
+        "unidade": 'data',
+        "origem": 'SCI',
+        "uso_na_analise": 'Ordenar e contextualizar processos SCI.',
+    },
+    84: {
+        "nome": 'SCI_Status SCI',
+        "descricao": 'Status do processo SCI.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'SCI',
+        "uso_na_analise": 'Identificar se a ação está aprovada, em análise ou em outra situação.',
+    },
+    85: {
+        "nome": 'SCI_Detentora',
+        "descricao": 'Detentora associada ao processo SCI.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'SCI',
+        "uso_na_analise": 'Comparar detentora entre fontes.',
+    },
+    86: {
+        "nome": 'SCI_Tipo SCI',
+        "descricao": 'Tipo de ação desejada na SCI.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'SCI',
+        "uso_na_analise": 'Identificar ampliação, redução, exclusão ou outra ação.',
+    },
+    87: {
+        "nome": 'SCI_AeV Final',
+        "descricao": 'AEV final previsto ou resultante da SCI.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'SCI',
+        "uso_na_analise": 'Comparar valores entre diferentes fontes.',
+    },
+    88: {
+        "nome": 'SCI_Solo Final',
+        "descricao": 'Área final de solo prevista ou resultante da SCI.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm²',
+        "origem": 'SCI',
+        "uso_na_analise": 'Comparar valores entre diferentes fontes.',
+    },
+
+    # =========================================================================
+    # 11. CAMPOS CALCULADOS - USAR SEMPRE COMO REFERÊNCIA PARA ANÁLISE
+    # =========================================================================
+    89: {
+        "nome": 'CALC_Contracted_AEV_Fonte',
+        "descricao": 'Fonte do AEV contratual consolidado para cálculo.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Cálculo',
+        "uso_na_analise": 'Fonte da referência tratada de contratado na etapa de cálculo.',
+    },    
+    90: {
+        "nome": 'CALC_Contracted_AEV',
+        "descricao": 'AEV contratual consolidado para cálculo.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'Cálculo',
+        "uso_na_analise": 'Referência tratada de contratado na etapa de cálculo.',
+    },
+    91: {
+        "nome": 'CALC_CA_Fonte',
+        "descricao": 'Fonte do coeficiente de arrasto usado no cálculo.',
+        "tipo_esperado": 'texto',
+        "unidade": 'não aplicável',
+        "origem": 'Cálculo',
+        "uso_na_analise": 'Fonte da referência tratada de contratado na etapa de cálculo.',
+    },
+    92:{
+        "nome": 'CALC_CA',
+        "descricao": 'Coeficiente de arrasto usado no cálculo.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'não aplicável',
+        "origem": 'Cálculo',
+        "uso_na_analise": 'Referência tratada de contratado na etapa de cálculo.',
+    },
+    93: {
+        "nome": 'CALC_AddpM2_AEV',
+        "descricao": 'Valor adicional por metro quadrado de AEV usado no cálculo.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'R$/m² de AEV',
+        "origem": 'Cálculo',
+        "uso_na_analise": 'Calcular impacto do adicional quando a regra permitir.',
+    },
+    94: {
+        "nome": 'CALC_Used_AEV_SCA',
+        "descricao": 'AEV utilizado calculado sem CA.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'Cálculo',
+        "uso_na_analise": 'Cenário calculado sem CA.',
+    },
+    95: {
+        "nome": 'CALC_Used_AEV_CCA',
+        "descricao": 'AEV utilizado calculado com CA.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'Cálculo',
+        "uso_na_analise": 'Cenário calculado com CA.',
+    },
+    96: {
+        "nome": 'CALC_Ocup_AEV',
+        "descricao": 'AEV de ocupação consolidado para decisão.',
+        "tipo_esperado": 'decimal',
+        "unidade": 'm² de AEV',
+        "origem": 'Cálculo',
+        "uso_na_analise": 'Ocupação final usada na etapa de decisão definida.',
+    },
+
+}
+
+
+def obter_contexto_bpr() -> str:
+    """Retorna o dicionário em formato textual para inclusão no prompt do agente."""
+    linhas = []
+    for ordem, coluna in DICIONARIO_COLUNAS.items():
+        linhas.append(
+            f"{ordem}. {coluna['nome']}: {coluna['descricao']} "
+            f"Tipo esperado: {coluna['tipo_esperado']}. "
+            f"Unidade: {coluna['unidade']}. "
+            f"Origem: {coluna['origem']}. "
+            f"Uso na análise: {coluna['uso_na_analise']}"
+        )
+    return "\n".join(linhas)
+
+
+def obter_nomes_colunas() -> list[str]:
+    """Retorna os nomes das colunas na ordem definida no dicionário."""
+    return [coluna["nome"] for coluna in DICIONARIO_COLUNAS.values()]

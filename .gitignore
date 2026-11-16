@@ -1,0 +1,20 @@
+# Configuração local (caminhos, projeto, chaves).
+.env
+
+# Bases e resultados: dado de negócio nunca entra no git. A raiz já barra
+# .xlsx e .csv; a saída do orquestrador é JSONL/JSON e precisa de regra
+# própria.
+dados/
+saida_orquestrador/
+*.jsonl
+
+__pycache__/
+.pytest_cache/
+
+# Frontend: dependências e build (o build é gerado, não versionado).
+frontend/node_modules/
+frontend/dist/
+*.xlsx
+*.xls
+*.csv
+credentials.json

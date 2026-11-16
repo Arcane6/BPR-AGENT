@@ -1,0 +1,127 @@
+/* Tokens do portal (docs/DESIGN.md do coverage-hub), só os que a tela usa. */
+:root {
+  --bpr-tinta: #0f1b2d;
+  --bpr-apagado: #5b6577;
+  --bpr-borda: #e3e7ed;
+  --bpr-fundo: #f5f7fa;
+  --bpr-superficie: #ffffff;
+  --bpr-destaque: #003399;
+  --bpr-destaque-suave: #eef2fb;
+}
+
+[data-mantine-color-scheme="dark"] {
+  --bpr-tinta: #eef3fa;
+  --bpr-apagado: #8fa0b8;
+  --bpr-borda: rgba(148, 170, 220, 0.14);
+  --bpr-fundo: #0b0f17;
+  --bpr-superficie: #131a26;
+  --bpr-destaque: #8aa3e0;
+  --bpr-destaque-suave: rgba(138, 163, 224, 0.14);
+}
+
+body {
+  background: var(--bpr-fundo);
+}
+
+.bpr-pagina {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 8px 0 48px;
+}
+
+/* Números alinhados nas tabelas e indicadores. */
+.bpr-numero {
+  font-variant-numeric: tabular-nums;
+}
+
+.bpr-rotulo {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--bpr-apagado);
+}
+
+.bpr-indicador {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--bpr-tinta);
+  font-variant-numeric: tabular-nums;
+}
+
+.bpr-linha-clicavel {
+  cursor: pointer;
+}
+
+.bpr-linha-clicavel:hover {
+  background: var(--bpr-destaque-suave);
+}
+
+/* Cabeçalho de coluna ordenável. */
+.bpr-ordenavel {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* Mapa das ações: uma célula por ação, cor pelo status. */
+.bpr-mapa-acoes {
+  display: flex;
+  gap: 2px;
+}
+
+.bpr-mapa-acoes span {
+  width: 10px;
+  height: 16px;
+  border-radius: 2px;
+}
+
+.bpr-mensagem-markdown p {
+  margin: 0 0 8px;
+}
+
+.bpr-mensagem-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.bpr-mensagem-markdown table {
+  border-collapse: collapse;
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.bpr-mensagem-markdown th,
+.bpr-mensagem-markdown td {
+  border: 1px solid var(--bpr-borda);
+  padding: 4px 8px;
+  text-align: left;
+}
+
+.bpr-apagado {
+  color: var(--bpr-apagado);
+}
+
+.bpr-json {
+  margin: 0;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* Tabela de resultados: célula numa linha só, e selo inteiro (o Badge do
+ * Mantine corta o texto com reticências quando a coluna aperta). */
+.bpr-tabela th,
+.bpr-tabela td {
+  white-space: nowrap;
+}
+
+.bpr-tabela .mantine-Badge-root {
+  max-width: none;
+  overflow: visible;
+}
+
+.bpr-tabela .mantine-Badge-label {
+  overflow: visible;
+  text-overflow: clip;
+}
