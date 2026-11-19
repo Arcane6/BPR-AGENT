@@ -22,7 +22,21 @@ from agente_bpr.ferramentas import comum
 def _sem_pasta_temporaria(valor):
     """Troca a pasta temporária por <DADOS>, para o dourado não depender dela."""
     texto = json.dumps(valor, ensure_ascii=False, default=str)
-    return json.loads(texto.replace(json.dumps(str(DADOS))[1:-1], "<DADOS>"))
+    trocado = json.loads(texto.replace(json.dumps(str(DADOS))[1:-1], "<DADOS>"))
+    return _barras_normais(trocado)
+
+
+def _barras_normais(valor):
+    """Caminho dentro de <DADOS> sempre com "/": os dourados foram gravados no
+    Linux e, no Windows, o mesmo caminho saía com "\\" (19 falhas na suíte,
+    todas por isso). Só mexe em texto que contém <DADOS>."""
+    if isinstance(valor, dict):
+        return {k: _barras_normais(v) for k, v in valor.items()}
+    if isinstance(valor, list):
+        return [_barras_normais(v) for v in valor]
+    if isinstance(valor, str) and "<DADOS>" in valor:
+        return valor.replace("\\", "/")
+    return valor
 
 
 def _escrever_base(linhas, cabecalho=None, aba="Base"):

@@ -190,6 +190,17 @@ CACHE_INSTRUCAO = _texto("BPR_CACHE_INSTRUCAO", "1") in {"1", "true", "TRUE", "s
 PRE_CHAMADAS = _texto("BPR_PRE_CHAMADAS", "1") not in {"0", "false", "FALSE", "nao"}
 CACHE_INSTRUCAO_TTL_S = _inteiro("BPR_CACHE_INSTRUCAO_TTL_S", 3600)
 
+# Endereço não encontrado, duplicado ou com erro na localização: o
+# campos_resultado é todo definido pela instrução (seção 14) e é montado sem
+# o modelo (agente_bpr/plano_deterministico.py). Desliga com 0.
+LOCALIZACAO_DETERMINISTICA = _texto("BPR_LOCALIZACAO_DETERMINISTICA", "1") not in {
+    "0", "false", "FALSE", "nao"}
+
+# Pré-busca das ferramentas de leitura por ENDEREÇOID (5.1, 6.2 e, com a 5.1
+# concluída, 5.2), sem o modelo e em paralelo. DESLIGADA por padrão até o
+# A/B no lote de referência (docs/DIAGNOSTICO_FASE1_2.md, bloco B5).
+PRE_BUSCA = _texto("BPR_PRE_BUSCA", "0") in {"1", "true", "TRUE", "sim"}
+
 # Numa execução do orquestrador, termina logo depois de gravar, sem pedir
 # ao modelo para reescrever o envelope como resposta final (guardas.py).
 ENCERRAR_APOS_GRAVAR = _texto("BPR_ENCERRAR_APOS_GRAVAR", "1") not in {"0", "false", "FALSE", "nao"}

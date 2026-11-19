@@ -177,6 +177,58 @@
    "status": "registrado"
   }
  ],
+ "chamadas_modelo": [
+  {
+   "entrada": 90000,
+   "entrada_em_cache": 0,
+   "erro": null,
+   "fim": null,
+   "indice": 1,
+   "pediu": [
+    "obter_data_referencia"
+   ],
+   "raciocinio": 2000,
+   "saida": 800,
+   "tentativa": 1
+  },
+  {
+   "entrada": 90000,
+   "entrada_em_cache": 0,
+   "erro": null,
+   "fim": null,
+   "indice": 2,
+   "pediu": [
+    "localizar_endereco"
+   ],
+   "raciocinio": 2000,
+   "saida": 800,
+   "tentativa": 1
+  },
+  {
+   "entrada": 90000,
+   "entrada_em_cache": 0,
+   "erro": null,
+   "fim": null,
+   "indice": 3,
+   "pediu": [
+    "salvar_resultado_bpr"
+   ],
+   "raciocinio": 2000,
+   "saida": 800,
+   "tentativa": 1
+  },
+  {
+   "entrada": 90000,
+   "entrada_em_cache": 0,
+   "erro": null,
+   "fim": null,
+   "indice": 4,
+   "pediu": [],
+   "raciocinio": 2000,
+   "saida": 800,
+   "tentativa": 1
+  }
+ ],
  "conclusoes_etapas": {},
  "consolidacao": {
   "CONCLUSAO_RESUMO": "Resumo da análise.",

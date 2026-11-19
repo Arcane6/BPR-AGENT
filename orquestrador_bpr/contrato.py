@@ -314,6 +314,17 @@ def verificar_coerencia(c: dict[str, Any]) -> list[Problema]:
     def alerta(codigo: str, msg: str) -> None:
         p.append(Problema("alerta", codigo, msg))
 
+    # Regra geral (seção 7 e seção 17, item c): ação que termina como
+    # DADOS_INSUFICIENTES registra o impedimento em DADOS_INSUFICIENTES.
+    # Caso real: RJCPS_0653 (lote 20261119-111445-628649) saiu com
+    # E1A1_STATUS = DADOS_INSUFICIENTES e a lista vazia, sem alerta nenhum.
+    insuficientes = [a.campo_status for a in ACOES
+                     if c.get(a.campo_status) == "DADOS_INSUFICIENTES"]
+    if insuficientes and not c.get("DADOS_INSUFICIENTES"):
+        alerta("dados_insuficientes_sem_registro",
+               f"{', '.join(insuficientes)} = DADOS_INSUFICIENTES, mas a lista "
+               "DADOS_INSUFICIENTES está vazia.")
+
     # 1.2 — COM_ADICIONAL segue o valor de Housing.
     if c.get("E1A2_STATUS") == "CONCLUIDA":
         valor = _num(c.get("E1A2_VALOR_ADICIONAL_HOUSING"))

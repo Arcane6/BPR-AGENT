@@ -81,6 +81,11 @@ class AuditorEventos:
         # A instrução tem ~89 mil tokens e vai em toda chamada: é este
         # número que diz quanto dela sai mais barato (docs/MAPEAMENTO.md, D1).
         "entrada_em_cache": 0})
+    # Uma linha por chamada ao modelo: o que pediu, quanto gastou e como
+    # terminou. Sem prompt nem resposta (só nomes de ferramenta e contagens).
+    # É o que responde "qual chamada gastou mais, e por quê".
+    por_chamada: list[dict[str, Any]] = field(default_factory=list)
+    tentativa: int = 1
 
     def consumir(self, evento: Any) -> None:
         for chamada in _lista(getattr(evento, "get_function_calls", None)):
@@ -115,6 +120,7 @@ class AuditorEventos:
 
         uso = getattr(evento, "usage_metadata", None)
         if uso is not None:
+            self._registrar_chamada(evento, uso)
             self.tokens["chamadas_modelo"] += 1
             self.tokens["entrada"] += getattr(uso, "prompt_token_count", 0) or 0
             self.tokens["saida"] += getattr(uso, "candidates_token_count", 0) or 0
@@ -137,6 +143,23 @@ class AuditorEventos:
             if any(getattr(r, "name", None) == "salvar_resultado_bpr"
                    for r in _lista(getattr(evento, "get_function_responses", None))):
                 self.encerrado_apos_gravar = True
+
+    def _registrar_chamada(self, evento: Any, uso: Any) -> None:
+        motivo = getattr(evento, "finish_reason", None)
+        self.por_chamada.append({
+            "tentativa": self.tentativa,
+            "indice": len(self.por_chamada) + 1,
+            "pediu": [getattr(c, "name", None)
+                      for c in _lista(getattr(evento, "get_function_calls", None))],
+            "entrada": getattr(uso, "prompt_token_count", 0) or 0,
+            "entrada_em_cache": getattr(uso, "cached_content_token_count", 0) or 0,
+            "saida": getattr(uso, "candidates_token_count", 0) or 0,
+            "raciocinio": getattr(uso, "thoughts_token_count", 0) or 0,
+            # Ex.: STOP, MAX_TOKENS, MALFORMED_FUNCTION_CALL. Saída vazia com
+            # MALFORMED_FUNCTION_CALL é o modelo tentando escrever código.
+            "fim": getattr(motivo, "name", None) or (str(motivo) if motivo else None),
+            "erro": getattr(evento, "error_code", None),
+        })
 
     def problemas_de_chamadas(self, escopo: Escopo) -> list[Problema]:
         problemas: list[Problema] = []
@@ -231,7 +254,10 @@ class ResultadoEndereco:
     origem_envelope: str | None = None     # resposta_final | persistencia
     problemas: list[Problema] = field(default_factory=list)
     chamadas: list[dict[str, Any]] = field(default_factory=list)
+    # Soma de TODAS as tentativas (antes: só a última, e o consumo saía menor
+    # do que o gasto de verdade quando havia nova tentativa).
     tokens: dict[str, int] = field(default_factory=dict)
+    chamadas_modelo: list[dict[str, Any]] = field(default_factory=list)
     tentativas: int = 0
     regravacoes: int = 0
     erro: str | None = None
@@ -258,6 +284,7 @@ class ResultadoEndereco:
             problemas=[Problema(**p) for p in registro.get("problemas") or []],
             chamadas=registro.get("chamadas") or [],
             tokens=registro.get("tokens") or {},
+            chamadas_modelo=registro.get("chamadas_modelo") or [],
             tentativas=registro.get("tentativas") or 0,
             regravacoes=registro.get("regravacoes") or 0,
             erro=registro.get("erro"),
@@ -273,11 +300,17 @@ class ResultadoEndereco:
             "problemas": [p.como_dict() for p in self.problemas],
             "chamadas": self.chamadas,
             "tokens": self.tokens,
+            "chamadas_modelo": self.chamadas_modelo,
             "tentativas": self.tentativas,
             "regravacoes": self.regravacoes,
             "erro": self.erro,
             "duracao_s": round(self.duracao_s, 1),
         }
+
+
+def _somar(total: dict[str, int], parcela: dict[str, int]) -> None:
+    for chave, valor in parcela.items():
+        total[chave] = total.get(chave, 0) + (valor or 0)
 
 
 def _recusa_definitiva(exc: BaseException) -> bool:
@@ -336,13 +369,22 @@ async def executar_endereco(
         "bpr:execution_id": execution_id,
         # Para as pré-chamadas do Agente BPR (agente_bpr/pre_chamadas.py).
         "bpr:enderecoid": enderecoid,
+        # Escopo, para a pré-busca e o encerramento na localização
+        # (agente_bpr/plano_deterministico.py).
+        "bpr:acoes": list(escopo.executar),
+        "bpr:acoes_codigos": list(escopo.codigos),
     }
     inicio = time.monotonic()
     auditor = AuditorEventos()
+    tokens_total: dict[str, int] = {}
+    chamadas_modelo: list[dict[str, Any]] = []
 
     for tentativa in range(1, max_tentativas + 1):
         resultado.tentativas = tentativa
-        auditor = AuditorEventos()
+        if tentativa > 1:
+            _somar(tokens_total, auditor.tokens)
+            chamadas_modelo.extend(auditor.por_chamada)
+        auditor = AuditorEventos(tentativa=tentativa)
         id_sessao = f"{execution_id}-t{tentativa}"
 
         async def consumir(id_sessao: str, auditor: AuditorEventos, tentativa: int) -> None:
@@ -395,7 +437,10 @@ async def executar_endereco(
             break
 
     resultado.chamadas = auditor.chamadas
-    resultado.tokens = auditor.tokens
+    _somar(tokens_total, auditor.tokens)
+    chamadas_modelo.extend(auditor.por_chamada)
+    resultado.tokens = tokens_total
+    resultado.chamadas_modelo = chamadas_modelo
 
     # --- Envelope: resposta final, com a persistência como referência ------
     do_texto = extrair_envelope(auditor.texto_final)

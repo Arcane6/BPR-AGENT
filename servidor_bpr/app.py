@@ -427,7 +427,7 @@ def criar_app(
             vistos.add(pasta.name)
             resumo = registros.ler_json(pasta / registros.RESUMO) or {}
             pedido = registros.ler_json(pasta / registros.PEDIDO) or {}
-            executados = len(registros.ler_registros(pasta))
+            executados = registros.contar_registros(pasta)
             lotes.append({
                 "lote_id": pasta.name,
                 "situacao": _situacao(pasta.name, pasta),

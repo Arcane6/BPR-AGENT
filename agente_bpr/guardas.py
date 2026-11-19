@@ -231,8 +231,23 @@ def _trava_da_execucao(tool_context: Any) -> asyncio.Lock:
     return trava
 
 
+# Ferramentas que só leem (arquivo local ou BigQuery) e não dependem umas
+# das outras: podem rodar ao mesmo tempo dentro da mesma execução, quando o
+# modelo (ou a pré-busca) pede várias juntas. Extração e gravação continuam
+# em série, pela trava da execução.
+SOMENTE_LEITURA = frozenset({
+    "obter_data_referencia",
+    "localizar_endereco",
+    "localizar_tssrs_disponiveis",
+    "localizar_tssrs_extraidos",
+    "localizar_equipamentos_tssr_extraido",
+    "localizar_enlaces_tx",
+})
+
+
 def em_thread(funcao: Callable[..., Any]) -> Callable[..., Any]:
-    """A mesma ferramenta, rodando numa thread e em série dentro da execução.
+    """A mesma ferramenta, rodando numa thread; em série dentro da execução,
+    exceto as de SOMENTE_LEITURA, que não disputam nada entre si.
 
     O ADK monta a declaração que o modelo lê a partir do nome, da
     docstring e da assinatura. A assinatura publicada é a da função
@@ -244,8 +259,12 @@ def em_thread(funcao: Callable[..., Any]) -> Callable[..., Any]:
         inspect.Parameter("tool_context", inspect.Parameter.KEYWORD_ONLY)
     ]
 
+    leitura = getattr(funcao, "__name__", "") in SOMENTE_LEITURA
+
     @functools.wraps(funcao)
     async def ferramenta(*, tool_context: Any, **argumentos: Any) -> Any:
+        if leitura:
+            return await asyncio.to_thread(funcao, **argumentos)
         async with _trava_da_execucao(tool_context):
             return await asyncio.to_thread(funcao, **argumentos)
 

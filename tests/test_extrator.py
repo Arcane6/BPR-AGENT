@@ -245,7 +245,7 @@ def _rodar(caminho, saida):
     return {
         "resposta": {k: resposta.get(k) for k in ("status", "resultado", "movido_para",
                                                     "arquivo_permanece_no_input")},
-        "destino": sorted(str(p.relative_to(TSSR_INPUT_DIR))
+        "destino": sorted(p.relative_to(TSSR_INPUT_DIR).as_posix()
                           for p in TSSR_INPUT_DIR.rglob("*.xlsx")),
         "log": linhas,
         **enviado,

@@ -176,8 +176,10 @@ def test_mensagem_e_estado_da_sessao():
                                            execution_id="exec-1", campos_schema=_schema()))
     [chamada] = gerar.chamadas
     assert chamada["sessao"] == "exec-1-t1"
+    escopo = resolver_escopo([])
     assert chamada["estado"] == {"bpr:permitir_extracao": False, "bpr:execution_id": "exec-1",
-                                 "bpr:enderecoid": "ACACLD0001"}
+                                 "bpr:enderecoid": "ACACLD0001",
+                                 "bpr:acoes": escopo.executar, "bpr:acoes_codigos": escopo.codigos}
     assert '"enderecoid": "ACACLD0001"' in chamada["mensagem"]
 
 

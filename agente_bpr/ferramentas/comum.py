@@ -127,6 +127,7 @@ def sem_campos_internos(itens: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 _cache_arquivos: dict[tuple[str, str], tuple[tuple[int, int], Any]] = {}
 _trava_cache = threading.Lock()
+_travas_por_chave: dict[tuple[str, str], threading.Lock] = {}
 
 
 def ler_com_cache(caminho: Path, leitor: Callable[[Path], Any], nome: str) -> Any:
@@ -143,12 +144,22 @@ def ler_com_cache(caminho: Path, leitor: Callable[[Path], Any], nome: str) -> An
     estado = caminho.stat()
     versao = (estado.st_mtime_ns, estado.st_size)
     chave = (str(caminho.resolve()), nome)
+    # Uma trava por arquivo e leitor: ler a base Excel não segura mais a
+    # leitura dos CSVs nas outras threads (antes, uma trava só para tudo).
+    # Quem chega junto para o MESMO arquivo espera e reaproveita a leitura.
     with _trava_cache:
         guardado = _cache_arquivos.get(chave)
         if guardado and guardado[0] == versao:
             return guardado[1]
+        trava = _travas_por_chave.setdefault(chave, threading.Lock())
+    with trava:
+        with _trava_cache:
+            guardado = _cache_arquivos.get(chave)
+            if guardado and guardado[0] == versao:
+                return guardado[1]
         valor = leitor(caminho)
-        _cache_arquivos[chave] = (versao, valor)
+        with _trava_cache:
+            _cache_arquivos[chave] = (versao, valor)
         return valor
 
 
@@ -156,6 +167,7 @@ def esquecer_cache() -> None:
     """Esvazia os caches de arquivos e de clientes do BigQuery (testes)."""
     with _trava_cache:
         _cache_arquivos.clear()
+        _travas_por_chave.clear()
     with _trava_clientes:
         _clientes.clear()
 
