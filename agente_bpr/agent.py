@@ -16,6 +16,7 @@ from .guardas import (
     ferramenta_inexistente,
 )
 from .modelo import CacheDaInstrucao, modelo_gemini
+from .pre_chamadas import antes_do_modelo as pre_chamadas
 from .instructions import AGENT_INSTRUCTION
 from .tools import (
     obter_data_referencia,
@@ -77,7 +78,10 @@ root_agent = Agent(
     # erro para ele, em vez de derrubar a análise (guardas.py).
     on_tool_error_callback=ferramenta_inexistente,
     # Instrução em cache compartilhado entre endereços, se ligado (modelo.py).
-    before_model_callback=cache_da_instrucao.antes_do_modelo,
+    # Antes: data e localização sem passar pelo modelo (pre_chamadas.py);
+    # depois, a instrução pelo cache (modelo.py). Quem devolve resposta
+    # encerra a fila: chamada feita pelas pré-chamadas não vai ao Vertex.
+    before_model_callback=[pre_chamadas, cache_da_instrucao.antes_do_modelo],
     on_model_error_callback=cache_da_instrucao.se_o_modelo_falhar,
     generate_content_config=types.GenerateContentConfig(
     temperature=0.1,),
