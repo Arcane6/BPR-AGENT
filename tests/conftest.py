@@ -50,6 +50,8 @@ def pytest_configure(config):
         # A trilha dos testes não pode cair na pasta auditoria/ do projeto.
         "BPR_AUDITORIA_DIR": str(AUDITORIA),
         "BPR_TRAVAS_DIR": str(AUDITORIA / "travas"),
+        # Sem Vertex nos testes: o cache da instrução fica desligado.
+        "BPR_CACHE_INSTRUCAO": "0",
     })
 
 

@@ -334,6 +334,8 @@ async def executar_endereco(
         # extração quando não autorizada (ver documento de revisão).
         "bpr:permitir_extracao": escopo.permitir_extracao,
         "bpr:execution_id": execution_id,
+        # Para as pré-chamadas do Agente BPR (agente_bpr/pre_chamadas.py).
+        "bpr:enderecoid": enderecoid,
     }
     inicio = time.monotonic()
     auditor = AuditorEventos()

@@ -178,9 +178,16 @@ THINKING_BUDGET, THINKING_BUDGET_AVISO = orcamento_de_raciocinio(
     MODEL_NAME, _inteiro("BPR_THINKING_BUDGET", THINKING_BUDGET_PADRAO))
 
 # Cache explícito da instrução no Vertex, compartilhado por todos os
-# endereços do processo (agente_bpr/modelo.py). Desligado por padrão até
-# ser conferido com o Vertex do projeto; liga com BPR_CACHE_INSTRUCAO=1.
-CACHE_INSTRUCAO = _texto("BPR_CACHE_INSTRUCAO", "0") in {"1", "true", "TRUE", "sim"}
+# endereços do processo (agente_bpr/modelo.py). A instrução (~89 mil tokens)
+# vai em toda chamada; no cache, o Vertex cobra essa parte com desconto.
+# Ligado por padrão: se o Vertex recusar o cache, ele se desliga sozinho e
+# as chamadas seguem sem. Desliga com BPR_CACHE_INSTRUCAO=0.
+CACHE_INSTRUCAO = _texto("BPR_CACHE_INSTRUCAO", "1") in {"1", "true", "TRUE", "sim"}
+
+# As duas primeiras ferramentas (data e localização) chamadas sem passar
+# pelo modelo, numa execução do orquestrador (agente_bpr/pre_chamadas.py):
+# duas chamadas de ~89 mil tokens a menos por endereço.
+PRE_CHAMADAS = _texto("BPR_PRE_CHAMADAS", "1") not in {"0", "false", "FALSE", "nao"}
 CACHE_INSTRUCAO_TTL_S = _inteiro("BPR_CACHE_INSTRUCAO_TTL_S", 3600)
 
 # Numa execução do orquestrador, termina logo depois de gravar, sem pedir
